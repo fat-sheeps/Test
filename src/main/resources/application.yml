@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: test-web
+
+server:
+  port: 8888
+  #undertow 配置
+  undertow:
+    io-threads: 16
+    worker-threads: 128
+    direct-buffers: true
+    max-http-post-size: 90000
+  compression:
+    enable: true
+    min-response-size: 40960
+    #tomcat配置
+  tomcat:
+    max-threads: 500
+
+#日志相关
+logging:
+  level:
+    org.springframework.web: info
+    io.lettuce.core.protocol: info
+  path:  /datadrive/logs/${spring.application.name}/
+  file: ${logging.path}/${spring.application.name}.log
+  config: classpath:log4j2.xml
+
+#数据库
+druid:
+  url: jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=GMT&useSSL=false
+  username: root
+  password: root
+  driverClass: com.mysql.cj.jdbc.Driver
+  type: com.alibaba.druid.pool.DruidDataSource
+  ## 初始化连接池的连接数量 大小，最小，最大
+  initialSize: 5
+  minIdle: 5
+  maxActive: 200
+  # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+  filters: stat,wall
+  maxWait: 60000
+  timeBetweenEvictionRunsMillis: 3000
+  minEvictableIdleTimeMillis: 300000
+  validationQuery: SELECT 'x'
+  testOnBorrow: true
+  testOnReturn: false
+  testOnWhileIdle: true
+  poolPreparedStatements: true
+  maxPoolPreparedStatementPerConnectionSize: 50
+
+#mybatis-plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: org.example.domain
+  configuration:
+    # 3.0.8之前版本问题默认将枚举注册为EnumOrdinalTypeHandler,这是错误的方式,默认是 org.apache.ibatis.type.EnumTypeHandler
+    # 如果项目之中实体统一使用IEnum或注解的方式,可配置成 com.baomidou.mybatisplus.extension.handlers.EnumTypeHandler,也可省略上面的type-enums-package配置
+    # 配置type-enums-package只对注解方式的枚举处理能提前加载缓存.
+    default-enum-type-handler: com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+  global-config:
+    db-config:
+      logic-not-delete-value: 1
+      logic-delete-value: 0
+      id-type: auto
+

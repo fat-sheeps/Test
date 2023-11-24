@@ -1,0 +1,42 @@
+
+<configuration>
+
+    <!--  <include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+    <logger name="org.springframework.web" level="info"/>
+
+
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 1GB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>1GB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度
+            %30.30c{30} 表示类名只打印30个字符并且右对齐不够30左补充 超过30左截断
+             %msg：日志消息，%n是换行符 -->
+            <pattern>%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-3line |%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- <root>
+        <appender-ref ref="ROLLING" />
+    </root> -->
+
+
+    <!--console log-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%yellow(%d) %cyan(%-5level) %highlight([%X{traceId}]) %cyan(%-20thread) | %green(%30.30c{30}:%-3line)  |%highlight(%msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="ROLLING" />
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
