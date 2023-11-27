@@ -19,12 +19,12 @@ server:
 
 #日志相关
 logging:
-  level:
-    org.springframework.web: info
-    io.lettuce.core.protocol: info
-  path:  /datadrive/logs/${spring.application.name}/
-  file: ${logging.path}/${spring.application.name}.log
-  config: classpath:log4j2.xml
+#  level:
+#    org.springframework.web: info
+#    io.lettuce.core.protocol: info
+#  path:  /datadrive/logs/${spring.application.name}/
+#  file: ${logging.path}/${spring.application.name}.log
+  config: classpath:logback.xml
 
 #数据库
 druid:
@@ -57,7 +57,7 @@ mybatis-plus:
     # 3.0.8之前版本问题默认将枚举注册为EnumOrdinalTypeHandler,这是错误的方式,默认是 org.apache.ibatis.type.EnumTypeHandler
     # 如果项目之中实体统一使用IEnum或注解的方式,可配置成 com.baomidou.mybatisplus.extension.handlers.EnumTypeHandler,也可省略上面的type-enums-package配置
     # 配置type-enums-package只对注解方式的枚举处理能提前加载缓存.
-    default-enum-type-handler: com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler
+    #default-enum-type-handler: com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler
     log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
   global-config:
     db-config:

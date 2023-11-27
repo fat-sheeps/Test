@@ -1,12 +1,13 @@
 
 <configuration>
-
+    <property name="app_name" value="test-web"/>
+    <property name="log_path" value="/datadrive/logs/${app_name}"/>
     <!--  <include resource="org/springframework/boot/logging/logback/base.xml"/>-->
     <logger name="org.springframework.web" level="info"/>
 
-
+    <!--file log-->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_FILE}</file>
+        <file>${log_path}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
             <fileNamePattern>${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
@@ -27,7 +28,6 @@
         <appender-ref ref="ROLLING" />
     </root> -->
 
-
     <!--console log-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -35,8 +35,10 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
+
     <root level="info">
         <appender-ref ref="ROLLING" />
         <appender-ref ref="STDOUT"/>
     </root>
+
 </configuration>
