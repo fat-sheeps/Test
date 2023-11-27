@@ -8,7 +8,6 @@ import org.example.config.MdcThreadPoolExecutor;
 import org.example.service.CommonService;
 import org.example.service.RunService;
 import org.example.service.TaskService;
-import org.example.service.TranService;
 import org.example.utils.IPUtil;
 import org.example.utils.MDCUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +35,8 @@ public class UndertowController implements HttpHandler {
             return;
         }
         String traceId = MDCUtil.generateTraceId();
-        log.info("traceId:{}", traceId);
         MDCUtil.setTraceId(traceId);
+        log.info("traceId:{}", traceId);
         httpServerExchange.startBlocking();
         log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
         long start = System.currentTimeMillis();
