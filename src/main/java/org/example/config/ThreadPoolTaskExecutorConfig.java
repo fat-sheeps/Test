@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+/**
+ * 异步线程拦截器-实现全局traceId
+ */
 @Configuration
 @EnableAsync  //开启异步操作
 public class ThreadPoolTaskExecutorConfig implements AsyncConfigurer {

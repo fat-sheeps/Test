@@ -6,6 +6,9 @@ import org.slf4j.MDC;
 
 import java.util.concurrent.*;
 
+/**
+ * 线程池-实现全局traceId
+ */
 public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
 
     public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {

@@ -1,22 +1,22 @@
 package org.example.global;
 
+import org.apache.commons.lang3.StringUtils;
 import org.example.utils.MDCUtil;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 全局链路追踪拦截器
+ * web全局链路追踪拦截器-实现全局traceId
  */
-public class TraceInterceptor extends HandlerInterceptorAdapter {
+public class TraceInterceptor implements AsyncHandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // "traceId"
         String traceId = request.getHeader(MDCUtil.TRACE_ID);
-        if (StringUtils.isEmpty(traceId)) {
+        if (StringUtils.isBlank(traceId)) {
             traceId = MDCUtil.generateTraceId();
         }
         MDCUtil.setTraceId(traceId);
