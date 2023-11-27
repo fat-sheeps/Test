@@ -62,15 +62,15 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${springboot-version}</version>
             <!--<exclusions>
-                &lt;!&ndash;以underTow服务器启动 spring-boot-starter-undertow&ndash;&gt;
+                &lt;!&ndash;以tomcat服务器启动 spring-boot-starter-tomcat&ndash;&gt;
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>-->
         </dependency>
-        <!--以tomcat服务器启动 spring-boot-starter-tomcat-->
-        <dependency>
+        <!--以undertow服务器启动 spring-boot-starter-undertow-->
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
             <version>${springboot-version}</version>
@@ -84,7 +84,7 @@
                     <artifactId>spring-boot-starter-log4j2</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <!-- Testing Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
