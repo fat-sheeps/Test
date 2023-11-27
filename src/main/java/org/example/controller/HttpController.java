@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.*;
 
 
@@ -33,6 +34,7 @@ public class HttpController {
     private Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     @RequestMapping(value = "/server")
+    @PostConstruct
     public Object server(){
         log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
         long start = System.currentTimeMillis();

@@ -61,14 +61,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${springboot-version}</version>
-            <exclusions>
-                <!--以underTow服务器启动 spring-boot-starter-undertow-->
+            <!--<exclusions>
+                &lt;!&ndash;以underTow服务器启动 spring-boot-starter-undertow&ndash;&gt;
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
+        <!--以tomcat服务器启动 spring-boot-starter-tomcat-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>

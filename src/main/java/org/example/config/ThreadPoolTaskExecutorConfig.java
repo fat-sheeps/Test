@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 @EnableAsync  //开启异步操作
 public class ThreadPoolTaskExecutorConfig implements AsyncConfigurer {
 
-    @Bean("SpExecutor")
+    @Bean("threadPoolTaskExc")
     public ThreadPoolTaskExecutor getAsyncExecutor() {
         // 对线程池进行包装，使之支持traceId透传
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor() {

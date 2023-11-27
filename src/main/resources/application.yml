@@ -19,12 +19,12 @@ server:
 
 #日志相关
 logging:
-#  level:
-#    org.springframework.web: info
-#    io.lettuce.core.protocol: info
-#  path:  /datadrive/logs/${spring.application.name}/
-#  file: ${logging.path}/${spring.application.name}.log
-  config: classpath:logback.xml
+  level:
+    org.springframework.web: info
+    io.lettuce.core.protocol: info
+  path:  /datadrive/logs/${spring.application.name}/
+  file: ${logging.path}/${spring.application.name}.log
+#  config: classpath:logback.xml
 
 #数据库
 druid:
@@ -58,7 +58,8 @@ mybatis-plus:
     # 如果项目之中实体统一使用IEnum或注解的方式,可配置成 com.baomidou.mybatisplus.extension.handlers.EnumTypeHandler,也可省略上面的type-enums-package配置
     # 配置type-enums-package只对注解方式的枚举处理能提前加载缓存.
     #default-enum-type-handler: com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler
-    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL日志
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl #关闭SQL日志
   global-config:
     db-config:
       logic-not-delete-value: 1

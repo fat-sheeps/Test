@@ -20,7 +20,7 @@
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度
             %30.30c{30} 表示类名只打印30个字符并且右对齐不够30左补充 超过30左截断
              %msg：日志消息，%n是换行符 -->
-            <pattern>%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-3line |%msg%n</pattern>
+            <pattern>%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-4line |%msg%n</pattern>
         </encoder>
     </appender>
 
@@ -31,7 +31,7 @@
     <!--console log-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%yellow(%d) %cyan(%-5level) %highlight([%X{traceId}]) %cyan(%-20thread) | %green(%30.30c{30}:%-3line)  |%highlight(%msg%n)</pattern>
+            <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread) | %green(%30.30c{30}:%-4line)  |%highlight(%msg%n)</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
