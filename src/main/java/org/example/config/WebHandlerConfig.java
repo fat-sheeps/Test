@@ -1,5 +1,6 @@
 package org.example.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.global.TraceInterceptor;
 import org.example.utils.IPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import javax.annotation.PostConstruct;
 
 @Configuration
+@Slf4j
 public class WebHandlerConfig extends WebMvcConfigurationSupport {
 
     @Autowired
@@ -48,8 +50,10 @@ public class WebHandlerConfig extends WebMvcConfigurationSupport {
         restTemplate.setRequestFactory(factory);
     }*/
 
+
     @PostConstruct
     public void init() {
         IPUtil.setPort(environment.getProperty("server.port"));
+        log.error("init!");
     }
 }

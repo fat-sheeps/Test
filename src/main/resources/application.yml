@@ -1,9 +1,11 @@
 spring:
   application:
     name: test-web
-
+  profiles:
+    active: dev
+#--spring.profiles.active=dev
 server:
-  port: 8888
+  port: 8080
   #undertow 配置
   undertow:
     io-threads: 16
