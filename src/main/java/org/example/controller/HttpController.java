@@ -11,8 +11,11 @@ import org.example.service.TranService;
 import org.example.utils.IPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 
@@ -32,8 +35,20 @@ public class HttpController {
 
     private Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
+    //方法入参和返回参数都必须与被服务降级的方法一致
+    public Map<String, Object> paymentOkFallbackHandler(long time) {
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("code", 200);
+        resultMap.put("message", "paymentOk超时，服务降级了");
+        resultMap.put("time", time);
+        return resultMap;
+    }
+
+//    @HystrixCommand(fallbackMethod = "paymentOkFallbackHandler", commandKey= "server", commandProperties = {
+//        //value表示当前线程的超时时间为3s
+//        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")})
     @RequestMapping(value = "/server")
-    public Object server(){
+    public Object server(@RequestParam long time) throws InterruptedException {
         log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
         long start = System.currentTimeMillis();
         log.info("-------------------executorService start: {}", start);
@@ -46,11 +61,10 @@ public class HttpController {
         MdcThreadPoolExecutor threadPoolExecutor = new MdcThreadPoolExecutor(225, 225, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         threadPoolExecutor.submit(new RunService(1));
         taskService.async(ip);
-        long end = System.currentTimeMillis();
         TranService.getInstance().doProcess("do tran!");
-        log.info("-------------------executorService end: {}", end);
+        Thread.sleep(time);
+        long end = System.currentTimeMillis();
         log.info("-------------------executorService timeout: {}", end - start);
-
         return commonService.queryAllUser();
     }
 
