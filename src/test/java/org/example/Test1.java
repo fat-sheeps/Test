@@ -1,11 +1,18 @@
 package org.example;
 
 
+import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSON;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.domain.AdexHystrixCommand;
 import org.example.domain.User;
-import org.example.utils.HttpUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.StopWatch;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -95,4 +102,94 @@ public class Test1 {
         }
         System.out.println("end");
     }
+
+    @Test
+    public void test6() throws InterruptedException {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("test1");
+        Thread.sleep(2012L);
+        stopWatch.stop();
+        stopWatch.start("test2");
+        Thread.sleep(2200L);
+        stopWatch.stop();
+        log.info("{} , {}", stopWatch.getLastTaskInfo().getTaskName(), stopWatch.getLastTaskInfo().getTimeNanos());
+        stopWatch.start("test3");
+        Thread.sleep(2300L);
+        stopWatch.stop();
+        log.info("{}", stopWatch.prettyPrint());
+    }
+
+    @Test
+    public void test7() throws ExecutionException, InterruptedException {
+        int num = 50;
+        ExecutorService executor = Executors.newFixedThreadPool(30);
+        List<Future<String>> futures = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            int j = i;
+            futures.add(executor.submit(() -> {
+                long start = System.currentTimeMillis();
+//                int timeout = RandomUtil.randomInt(700, 1500);
+                int timeout = 1000;
+                try {
+                    //log.info("---------------开始-----------------{}", j);
+                    AdexHystrixCommand commond = new AdexHystrixCommand("group", "commond" + timeout, timeout);
+//                    log.info("{}",commond);
+//                    log.info("{}",commond.getThreadPoolKey());
+                    String res = commond.execute();
+                    long end = System.currentTimeMillis();
+                    return j + "-completed-限制timeout:" + timeout + ",执行time:" + (end - start) + "业务耗时：" + res;
+
+                } catch (HystrixRuntimeException e) {
+                    //log.error(e.getMessage());
+                    long end = System.currentTimeMillis();
+                    return j + "-Hystrix-限制timeout:" + timeout + ",执行time:" + (end - start);
+                }
+            }));
+        }
+        List<String> results = new ArrayList<>();
+        for (Future<String> future : futures) {
+            results.add(future.get());
+        }
+        System.out.println(JSON.toJSONString(results));
+
+    }
+
+    @Test
+    public void test8() throws ExecutionException, InterruptedException {
+        int num = 50;
+        ExecutorService executor = Executors.newFixedThreadPool(30);
+        List<Future<String>> futures = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            futures.add(executor.submit(() -> {
+                int t = RandomUtil.randomInt(0, 2000);
+                Thread.sleep(t);
+                return t+"";
+            }));
+        }
+        List<String> results = new ArrayList<>();
+        for (Future<String> future : futures) {
+            results.add(future.get());
+        }
+        System.out.println(JSON.toJSONString(results));
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

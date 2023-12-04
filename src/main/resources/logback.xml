@@ -31,7 +31,7 @@
     <!--console log-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread) | %green(%30.30c{30}:%-4line)  |%highlight(%msg%n)</pattern>
+            <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread) | %green(%50.50c{50}:%-4line)  |%highlight(%msg%n)</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>

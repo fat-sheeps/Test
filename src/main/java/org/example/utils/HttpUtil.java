@@ -95,7 +95,7 @@ public class HttpUtil {
             //设置请求方法
             connection.setRequestMethod("POST");
             //设置连接超时时间
-            connection.setConnectTimeout(1);
+            connection.setConnectTimeout(10);
             //设置读取超时时间
             connection.setReadTimeout(3000);
             //DoOutput设置是否向httpUrlConnection输出，DoInput设置是否从httpUrlConnection读入，此外发送post请求必须设置这两个
@@ -120,7 +120,7 @@ public class HttpUtil {
                 is = connection.getInputStream();
                 if (null != is) {
                     br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                    String temp = null;
+                    String temp;
                     while (null != (temp = br.readLine())) {
                         result.append(temp);
                         result.append("\r\n");

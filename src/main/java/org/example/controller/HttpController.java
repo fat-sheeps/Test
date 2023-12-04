@@ -1,9 +1,13 @@
 package org.example.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.config.MdcThreadPoolExecutor;
+import org.example.domain.AdexHystrixCommand;
 import org.example.service.CommonService;
 import org.example.service.RunService;
 import org.example.service.TaskService;
@@ -13,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 import java.util.concurrent.*;
 
 
@@ -44,7 +50,7 @@ public class HttpController {
         return resultMap;
     }
 
-//    @HystrixCommand(fallbackMethod = "paymentOkFallbackHandler", commandKey= "server", commandProperties = {
+    //    @HystrixCommand(fallbackMethod = "paymentOkFallbackHandler", commandKey= "server", commandProperties = {
 //        //value表示当前线程的超时时间为3s
 //        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")})
     @RequestMapping(value = "/server")
@@ -69,24 +75,70 @@ public class HttpController {
     }
 
     @RequestMapping(value = "/hello")
-    public String hello() throws InterruptedException {
+    public Object hello() throws InterruptedException {
 //        long start = System.currentTimeMillis();
 //        taskService.getMsgMap();
 //        long end = System.currentTimeMillis();
 //        log.info("time:{}", end - start);
-        cache.put("1","11");
-        System.out.println((cache.getIfPresent("1")));
-        Thread.sleep(5100L);
-        System.out.println((cache.getIfPresent("1")));
-        cache.put("2","22");
-        Thread.sleep(5100L);
-        System.out.println((cache.getIfPresent("1")));
-        System.out.println((cache.getIfPresent("2")));
-        Thread.sleep(5100L);
-        return cache.getIfPresent("2");
+//        cache.put("1", "11");
+//        System.out.println((cache.getIfPresent("1")));
+//        Thread.sleep(5100L);
+//        System.out.println((cache.getIfPresent("1")));
+//        cache.put("2", "成功");
+//        Thread.sleep(5100L);
+//        System.out.println((cache.getIfPresent("1")));
+//        System.out.println((cache.getIfPresent("2")));
+//        Thread.sleep(5100L);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("1","你好");
+        return jsonObject;
 
     }
 
+    private ScheduledExecutorService scheduledExecutorService;
+    @RequestMapping(value = "/stop")
+    public void stop(){
+        scheduledExecutorService.shutdown();
+    }
+    @RequestMapping(value = "/hystrix", produces = "application/json;charset=UTF-8")
+    public String hystrix(int num) throws ExecutionException, InterruptedException {
+//        ExecutorService executor = Executors.newFixedThreadPool(30);
+        scheduledExecutorService = Executors.newScheduledThreadPool(num);
+
+        for (int i = 0; i < num; i++) {
+            scheduledExecutorService.scheduleAtFixedRate( new AdxTask(), (int) (i*(1000.0/num)), 1, TimeUnit.SECONDS);
+        }
+        Thread.sleep(2000L);
+        this.stop();
+//        List<Future<String>> futures = new ArrayList<>();
+//        for (int i = 0; i < num; i++) {
+//            int j = i;
+//            futures.add(executor.submit(() -> {
+//                long start = System.currentTimeMillis();
+////                int timeout = RandomUtil.randomInt(700, 1500);
+//                int timeout = 1000;
+//                try {
+//                    //log.info("---------------开始-----------------{}", j);
+//                    AdexHystrixCommand commond = new AdexHystrixCommand("group", "command" + timeout, timeout);
+////                    log.info("{}",commond);
+////                    log.info("{}",commond.getThreadPoolKey());
+//                    String res = commond.execute();
+//                    long end = System.currentTimeMillis();
+//                    return j + "-completed-限制timeout:" + timeout + ",执行time:" + (end - start) + "业务耗时：" + res;
+//
+//                } catch (HystrixRuntimeException e) {
+//                    //log.error(e.getMessage());
+//                    long end = System.currentTimeMillis();
+//                    return j + "-Hystrix-限制timeout:" + timeout + ",执行time:" + (end - start);
+//                }
+//            }));
+//        }
+//        List<String> results = new ArrayList<>();
+//        for (Future<String> future : futures) {
+//            results.add(future.get());
+//        }
+        return (JSON.toJSONString("成功"));
+    }
 
 
 }
