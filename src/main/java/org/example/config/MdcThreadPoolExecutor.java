@@ -11,6 +11,8 @@ import java.util.concurrent.*;
  */
 public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
 
+    private static final MdcThreadPoolExecutor mdcThreadPoolExecutor = new MdcThreadPoolExecutor(225, 225, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+
     public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
     }
@@ -25,6 +27,10 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
 
     public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+    }
+
+    public static MdcThreadPoolExecutor getMdcThreadPoolExecutor() {
+        return mdcThreadPoolExecutor;
     }
 
     @Override

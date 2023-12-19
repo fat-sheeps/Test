@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.Cache;
@@ -7,7 +8,8 @@ import com.google.common.cache.CacheBuilder;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.config.MdcThreadPoolExecutor;
-import org.example.domain.AdexHystrixCommand;
+import org.example.domain.AdxCommon;
+import org.example.domain.DspHystrixCommand;
 import org.example.service.CommonService;
 import org.example.service.RunService;
 import org.example.service.TaskService;
@@ -17,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -55,22 +54,23 @@ public class HttpController {
 //        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")})
     @RequestMapping(value = "/server")
     public Object server(@RequestParam long time) throws InterruptedException {
-        log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
-        long start = System.currentTimeMillis();
-        log.info("-------------------executorService start: {}", start);
-        String ip = IPUtil.getIp();
-        String port = IPUtil.getPort();
-        String str = "Server IP :" + ip + " port: " + port;
-        log.info("-------------------str: {}", str);
+//        log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
+//        long start = System.currentTimeMillis();
+//        log.info("-------------------executorService start: {}", start);
+//        String ip = IPUtil.getIp();
+//        String port = IPUtil.getPort();
+//        String str = "Server IP :" + ip + " port: " + port;
+//        log.info("-------------------str: {}", str);
+
 //        executorService = Executors.newSingleThreadExecutor();
 //        executorService.submit(new RunService(1));
-        MdcThreadPoolExecutor threadPoolExecutor = new MdcThreadPoolExecutor(225, 225, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        threadPoolExecutor.submit(new RunService(1));
-        taskService.async(ip);
-        TranService.getInstance().doProcess("do tran!");
+//        MdcThreadPoolExecutor threadPoolExecutor = MdcThreadPoolExecutor.getMdcThreadPoolExecutor();
+//        threadPoolExecutor.submit(new RunService(1));
+//        taskService.async(ip);
+//        TranService.getInstance().doProcess("do tran!");
         Thread.sleep(time);
         long end = System.currentTimeMillis();
-        log.info("-------------------executorService timeout: {}", end - start);
+//        log.info("-------------------executorService timeout: {}", end - start);
         return commonService.queryAllUser();
     }
 
@@ -89,6 +89,7 @@ public class HttpController {
 //        System.out.println((cache.getIfPresent("1")));
 //        System.out.println((cache.getIfPresent("2")));
 //        Thread.sleep(5100L);
+        Thread.sleep(150L);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("1","你好");
         return jsonObject;
@@ -101,35 +102,36 @@ public class HttpController {
         scheduledExecutorService.shutdown();
     }
     @RequestMapping(value = "/hystrix", produces = "application/json;charset=UTF-8")
-    public String hystrix(int num) throws ExecutionException, InterruptedException {
-//        ExecutorService executor = Executors.newFixedThreadPool(30);
-        scheduledExecutorService = Executors.newScheduledThreadPool(num);
-
+    public Object hystrix(int num) throws InterruptedException, ExecutionException {
+        scheduledExecutorService = Executors.newScheduledThreadPool(1000);
+        AdxCommon.num.set(0);
         for (int i = 0; i < num; i++) {
-            scheduledExecutorService.scheduleAtFixedRate( new AdxTask(), (int) (i*(1000.0/num)), 1, TimeUnit.SECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(new AdxTask(), (int)(i*(1000.0/num)), 1000, TimeUnit.MILLISECONDS);
+
         }
-        Thread.sleep(2000L);
-        this.stop();
 //        List<Future<String>> futures = new ArrayList<>();
 //        for (int i = 0; i < num; i++) {
-//            int j = i;
-//            futures.add(executor.submit(() -> {
-//                long start = System.currentTimeMillis();
-////                int timeout = RandomUtil.randomInt(700, 1500);
+//            futures.add(MdcThreadPoolExecutor.getMdcThreadPoolExecutor().submit(() -> {
 //                int timeout = 1000;
+//                long start = System.currentTimeMillis();
+//                int t = RandomUtil.randomInt(0, 2000);
 //                try {
 //                    //log.info("---------------开始-----------------{}", j);
-//                    AdexHystrixCommand commond = new AdexHystrixCommand("group", "command" + timeout, timeout);
-////                    log.info("{}",commond);
-////                    log.info("{}",commond.getThreadPoolKey());
-//                    String res = commond.execute();
+//                    DspHystrixCommand command = new DspHystrixCommand("group", "command" + timeout, timeout, t);
+//                    //log.info("t:{}---------------DspHystrixCommand-----------------{}",t, System.currentTimeMillis() - start);
+//                    String res = command.execute();
+//                    //log.info("t:{}---------------command.execute()-----------------{}",t, System.currentTimeMillis() - start);
 //                    long end = System.currentTimeMillis();
-//                    return j + "-completed-限制timeout:" + timeout + ",执行time:" + (end - start) + "业务耗时：" + res;
+//                    String s = "-Completed-timeout:" + timeout + ",执行time:[" + (end - start) + "],t：" + res + ",t:" + t;
+//                    log.info(s);
+//                    return s;
 //
 //                } catch (HystrixRuntimeException e) {
 //                    //log.error(e.getMessage());
 //                    long end = System.currentTimeMillis();
-//                    return j + "-Hystrix-限制timeout:" + timeout + ",执行time:" + (end - start);
+//                    String s = "-Hystrixed-timeout:" + timeout + ",执行time:[" + (end - start) + "],t:" + t;
+//                    log.error(s);
+//                    return s;
 //                }
 //            }));
 //        }
@@ -137,7 +139,110 @@ public class HttpController {
 //        for (Future<String> future : futures) {
 //            results.add(future.get());
 //        }
-        return (JSON.toJSONString("成功"));
+        return "results";
+    }
+
+    /**
+     * 这个是有效流控的
+     * @param num
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    @RequestMapping(value = "/hystrix1", produces = "application/json;charset=UTF-8")
+    public Object hystrix1(int num) throws InterruptedException, ExecutionException {
+        long start = System.currentTimeMillis();
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+
+
+        for (int i = 0; i < num; i++) {
+            int j = i;
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                return callHttp("http:" + j); // 替换为实际的接口地址
+            });
+
+            CompletableFuture<String> timedFuture = future
+                    //限制响应耗时150毫秒内
+                    //.completeOnTimeout("timeout!", 150, TimeUnit.MILLISECONDS)
+                    .thenApply(response -> {
+                        // 处理超时
+                        //log.error("HTTP request timed out");
+                        // 或者其他标识，视需求而定
+                        return response;
+                    });
+
+            futures.add(timedFuture);
+        }
+
+        //将请求结果放在results中 包括timeout的
+        List<String> results = new ArrayList<>();
+        for (CompletableFuture<String> future : futures) {
+            String response = future.get();
+            if (response != null) {
+                results.add(response);
+            }
+        }
+
+        // 打印成功的响应
+        log.info("Successful Responses: " + results);
+        long end = System.currentTimeMillis();
+        log.info("end time: " + (end - start));
+        return results;
+    }
+
+    @RequestMapping(value = "/hystrix2", produces = "application/json;charset=UTF-8")
+    public Object hystrix2(int num) throws InterruptedException, ExecutionException {
+        long start = System.currentTimeMillis();
+        CountDownLatch countDownLatch = new CountDownLatch(num);
+        ExecutorService executor = Executors.newFixedThreadPool(num);
+        List<String> futures = new ArrayList<>();
+        // 执行耗时操作，例如发送HTTP请求或数据库查询
+        for (int i = 0; i < num; i++) {
+            Future<String> future = executor.submit(() -> {
+
+                int t = RandomUtil.randomInt(10, 400);
+                try {
+                    log.info(" t:{}", t);
+                    Thread.sleep(t);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return "Task completed";
+            });
+            String res;
+            try {
+                res = future.get(150, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                //log.error("error:{}", e.getMessage());
+                res = "timeout!";
+            }
+            futures.add(res);
+            countDownLatch.countDown();
+
+        }
+        long end = System.currentTimeMillis();
+        log.info("HttpUtil.doGet 耗时：{}", end - start);
+
+        String result = futures.toString();
+        log.info(result);
+        executor.shutdown(); // 关闭线程池
+
+        long end2 = System.currentTimeMillis();
+        log.info("HttpUtil.doGet 耗时：{}", end2 - start);
+        return result;
+    }
+
+    private static String callHttp(String url) {
+        //模拟http请求耗时100~200毫秒
+        int t = RandomUtil.randomInt(100, 200);
+        try {
+            log.info("{} t:{}", url, t);
+            Thread.sleep(t);
+        } catch (Exception e) {
+            log.error("error:",e);
+        }
+
+        return url + " time:" + t;
     }
 
 

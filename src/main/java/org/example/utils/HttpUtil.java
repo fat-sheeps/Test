@@ -134,6 +134,7 @@ public class HttpUtil {
         } catch (IOException e) {
             log.error("error:",e);
         } finally {
+            log.info("HttpUtil.doPost 耗时：{}", System.currentTimeMillis() - start);
             if (br != null) {
                 try {
                     br.close();

@@ -8,11 +8,18 @@
     <!--file log-->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log_path}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                ${log_path}-.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+            <!-- keep 60 days worth of history -->
+            <MaxHistory>60</MaxHistory>
+        </rollingPolicy>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log_path}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- each file should be at most 1GB, keep 60 days worth of history, but at most 20GB -->
-            <maxFileSize>1GB</maxFileSize>
+            <maxFileSize>10MB</maxFileSize>
             <maxHistory>60</maxHistory>
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
@@ -31,7 +38,7 @@
     <!--console log-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread) | %green(%50.50c{50}:%-4line)  |%highlight(%msg%n)</pattern>
+            <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread)|%green(%30.30c{30}:%-4line)|%highlight(%msg%n)</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
