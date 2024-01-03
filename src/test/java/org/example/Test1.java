@@ -11,19 +11,28 @@ import org.example.domain.DspHystrixCommand;
 import org.example.domain.User;
 import org.example.utils.HttpUtil;
 import org.example.utils.MDCUtil;
+import org.example.utils.SystemUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StopWatch;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.zip.GZIPInputStream;
 
 @Slf4j
 public class Test1 {
@@ -482,6 +491,142 @@ public class Test1 {
 //        }
         System.out.println(System.currentTimeMillis() - start);
     }
+
+    @Test
+    public void test18() {
+        long randomThreshold = (long) (10485760L * (1 + (Math.random() - 0.5) * 1));
+        System.out.println();
+    }
+
+    @Test
+    public void test19() {
+//        Set<String> set2 = new HashSet<>();
+//        Collections.addAll(set2, "apple", "banana", "orange");
+//        System.out.println(set2);
+//        Map<String, String> map = new HashMap<>();
+//        map.put("", "");
+//        System.out.println(map);
+
+//        User user = new User();
+//        List<Integer> types = new ArrayList<>();
+//        types.add(1);
+//        types.add(2);
+//        types.add(3);
+//
+//        types.add(0,0);
+//        user.setTypes(types);
+//
+//        System.out.println(user);
+//
+//        Set<String> set = new LinkedHashSet<>();
+//        set.add("A");
+//        set.add("B");
+//        set.add("C");
+//
+//        System.out.println("原始集合: " + set);
+//        List<String> list = new ArrayList<>(set);
+//
+//        list.add(0,"D"); // 在头部插入新元素"D"
+//        set = new HashSet<>(list);
+//
+//        System.out.println("插入新元素后的集合: " + set);
+//
+//        Long a = null;
+//        System.out.println((String) a);
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.addAll(Arrays.asList("Hello", "World", "!"));
+        list.add("3");
+        String[] array = list.toArray(new String[0]);;
+        list = new ArrayList<>();
+        System.out.println(list.contains("aaa"));
+
+
+    }
+
+    @Test
+    public void test20() {
+        StringBuilder str = new StringBuilder();
+        for (MemoryPoolMXBean memoryPool : ManagementFactory.getMemoryPoolMXBeans()) {
+            if (memoryPool.getType() == MemoryType.HEAP) {
+                str.append("堆内内存：").append(SystemUtil.padRightWithSpaces(memoryPool.getName(), 20));
+                str.append("初始大小：").append(memoryPool.getUsage().getInit() / (1024 * 1024)).append("MB");
+                str.append("\t已使用大小：").append(memoryPool.getUsage().getUsed() / (1024 * 1024)).append("MB");
+                str.append("\t最大大小：").append(memoryPool.getUsage().getMax() / (1024 * 1024)).append("MB");
+                str.append("\t已提交大小：").append(memoryPool.getUsage().getCommitted() / (1024 * 1024)).append("MB");
+                str.append("\t使用率：").append(memoryPool.getUsage().getUsed() * 100d / memoryPool.getUsage().getMax()).append("%");
+                str.append("\r\n");
+                str.append("=================================================================================================================================\r\n");
+            }
+        }
+        System.out.println(str);
+    }
+
+    @Test
+    public void test21() {
+        StringBuilder str = new StringBuilder();
+        //获取堆内存信息
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        str.append("-Xmx(最大可用内存): ").append(maxMemory / 1024 / 1024).append("MB");
+        str.append("\r\n");
+        str.append("-Xms(已获得内存): ").append(totalMemory / 1024 / 1024).append("MB");
+        str.append("\r\n");
+        str.append("================================================================================================================\r\n");
+        //获取栈内存信息
+        int processor = Runtime.getRuntime().availableProcessors();
+        String stackSize = System.getProperty("sun.arch.data.model");
+        int Kilo = 1024;
+        int stackInKilo;
+        if ("32".equals(stackSize)) {
+            stackInKilo = Kilo * 4;
+        } else {
+            stackInKilo = Kilo * 8;
+        }
+        long totalStack = (long)stackInKilo * processor;
+        str.append("当前使用的CPU内核数:").append(processor);
+        str.append("\r\n");
+        str.append("每个线程栈内存大小:").append(stackInKilo / Kilo).append("KB");
+        str.append("\r\n");
+        str.append("最大可用栈内存:").append(totalStack / Kilo).append("KB");
+        str.append("\r\n");
+
+        System.out.println(str.toString());
+    }
+
+    @Test
+    public void test22() {
+        Instrumentation instrumentation = getInstrumentation();
+        if (instrumentation == null) {
+            System.out.println("无法获取Instrumentation实例");
+        }
+
+        // 获取对象大小
+        long size = instrumentation.getObjectSize(new User());
+        System.out.println(size);
+    }
+
+    private static Instrumentation getInstrumentation() {
+        try {
+            // 通过反射获取当前线程的Instrumentation实例
+            Class<?> instrumentationClass = Class.forName("java.lang.instrument.Instrumentation");
+            return (Instrumentation) instrumentationClass.getMethod("getInitiatedClasses").invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Test
+    public void test23() {
+        LocalDateTime date = LocalDateTime.now();
+        System.out.println(LocalDate.parse("2024-01-03", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+        System.out.println(LocalDate.parse("2024-01-03", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().withHour(23).withMinute(59).withSecond(59));
+
+    }
+
+
 
 
 }

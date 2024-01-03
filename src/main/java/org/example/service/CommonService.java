@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.domain.User;
 import org.example.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,5 +23,9 @@ public class CommonService {
         List<User> users = userMapper.selectList(queryWrapper);
         log.info("queryAllUser users:{}", JSON.toJSONString(users));
         return users;
+    }
+    @Scheduled(cron = "0 * * * * ?")
+    public void print() {
+        log.info("Scheduled!");
     }
 }

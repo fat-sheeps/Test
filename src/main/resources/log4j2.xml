@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--设置Log4j2的自身Log级别为warn -->
+<configuration status="warn">
+    <properties>
+        <Property name="app_name">test-web</Property>
+        <Property name="log_path">/datadrive/logs/${app_name}</Property>
+        <Property name="maxfile">50</Property>
+    </properties>
+    <appenders>
+        <console name="console" target="SYSTEM_OUT" >
+            <!--%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread)|%green(%30.30c{30}:%-4line)|%highlight(%msg%n)-->
+            <PatternLayout
+                    pattern="%style{%d{ISO8601}}{yellow} %style{%-5level}{white}[%style{%-20thread}{cyan}][%style{%X{traceId}}{magenta}][%style{%30.30c{30}:%-4line}{green}]%style{%msg%n}{blue}%style{%throwable}{red}"
+                    disableAnsi="false" noConsoleNoAnsi="false"/>
+        </console>
+
+        <RollingFile name="rollingFileInfo" fileName="${log_path}.log"
+                     filePattern="${log_path}-%d{yyyy-MM-dd}-%i.log.gz" >
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-4line |%msg%n"/>
+                <Policies>
+                    <TimeBasedTriggeringPolicy interval="1" modulate="true" maxRandomDelay="300"/>
+                    <RandomSizeBasedTriggeringPolicy size="1 MB" randomFactorSize="5M"/>
+                </Policies>
+                <DefaultRolloverstrategy max="10" compressionLevel="0"/>
+        </RollingFile>
+        <RollingFile name="rollingFileError" fileName="${log_path}_error.log"
+                     filePattern="${log_path}_error-%d{yyyy-MM-dd}-%i.log.gz" >
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-4line |%msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"  maxRandomDelay="300"/>
+                <SizeBasedTriggeringPolicy size="512 MB"/>
+            </Policies>
+        <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <root level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="rollingFileInfo"/>
+            <appender-ref level="Error" ref="rollingFileError"/>
+
+        </root>
+    </loggers>
+</configuration>

@@ -15,11 +15,13 @@ import org.example.service.RunService;
 import org.example.service.TaskService;
 import org.example.service.TranService;
 import org.example.utils.IPUtil;
+import org.example.utils.SystemUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.instrument.Instrumentation;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -54,6 +56,7 @@ public class HttpController {
 //        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")})
     @RequestMapping(value = "/server")
     public Object server(@RequestParam long time) throws InterruptedException {
+        log.error("error");
 //        log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
 //        long start = System.currentTimeMillis();
 //        log.info("-------------------executorService start: {}", start);
@@ -243,6 +246,196 @@ public class HttpController {
         }
 
         return url + " time:" + t;
+    }
+
+    private final static List<String> list = new ArrayList<>();
+    @RequestMapping(value = "/memory")
+    public Object memory(@RequestParam long num) {
+        String str = "2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)2023-12-08 18:19:41,128 ERROR [] pool-1-thread-51    |o.e.controller.HttpController1:70  |HystrixRuntimeException:\n" +
+                "com.netflix.hystrix.exception.HystrixRuntimeException: command1000 fallback execution rejected.\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleFallbackRejectionByEmittingError(AbstractCommand.java:1043)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.getFallbackOrThrowException(AbstractCommand.java:875)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.handleTimeoutViaFallback(AbstractCommand.java:997)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand.access$500(AbstractCommand.java:60)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:609)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$12.call(AbstractCommand.java:601)\n" +
+                "\tat rx.internal.operators.OperatorOnErrorResumeNextViaFunction$4.onError(OperatorOnErrorResumeNextViaFunction.java:140)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat rx.internal.operators.OnSubscribeDoOnEach$DoOnEachSubscriber.onError(OnSubscribeDoOnEach.java:87)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$1.run(AbstractCommand.java:1142)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:41)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable$1.call(HystrixContextRunnable.java:37)\n" +
+                "\tat com.netflix.hystrix.strategy.concurrency.HystrixContextRunnable.run(HystrixContextRunnable.java:57)\n" +
+                "\tat com.netflix.hystrix.AbstractCommand$HystrixObservableTimeoutOperator$2.tick(AbstractCommand.java:1159)\n" +
+                "\tat com.netflix.hystrix.util.HystrixTimer$1.run(HystrixTimer.java:99)\n" +
+                "\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset$$$capture(FutureTask.java:308)\n" +
+                "\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\n" +
+                "\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n" +
+                "\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n" +
+                "\tat java.lang.Thread.run(Thread.java:750)";
+        for (int i = 0; i < num; i++) {
+            list.add(str);
+        }
+
+        String string = SystemUtil.getMemoryInfoDetail();
+        return string;
+    }
+    private static Instrumentation getInstrumentation() {
+        try {
+            // 通过反射获取当前线程的Instrumentation实例
+            Class<?> instrumentationClass = Class.forName("java.lang.instrument.Instrumentation");
+            return (Instrumentation) instrumentationClass.getMethod("getInitiatedClasses").invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 

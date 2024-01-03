@@ -1,41 +1,41 @@
 
 <configuration>
-    <property name="app_name" value="test-web"/>
+    <!--<property name="app_name" value="test-web"/>
     <property name="log_path" value="/datadrive/logs/${app_name}"/>
-    <!--  <include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+    &lt;!&ndash;  <include resource="org/springframework/boot/logging/logback/base.xml"/>&ndash;&gt;
     <logger name="org.springframework.web" level="info"/>
 
-    <!--file log-->
+    &lt;!&ndash;file log&ndash;&gt;
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log_path}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>
                 ${log_path}-.%d{yyyy-MM-dd}.log
             </FileNamePattern>
-            <!-- keep 60 days worth of history -->
+            &lt;!&ndash; keep 60 days worth of history &ndash;&gt;
             <MaxHistory>60</MaxHistory>
         </rollingPolicy>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
+            &lt;!&ndash; rollover daily &ndash;&gt;
             <fileNamePattern>${log_path}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 1GB, keep 60 days worth of history, but at most 20GB -->
+            &lt;!&ndash; each file should be at most 1GB, keep 60 days worth of history, but at most 20GB &ndash;&gt;
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>60</maxHistory>
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度
+            &lt;!&ndash; 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度
             %30.30c{30} 表示类名只打印30个字符并且右对齐不够30左补充 超过30左截断
-             %msg：日志消息，%n是换行符 -->
+             %msg：日志消息，%n是换行符 &ndash;&gt;
             <pattern>%d %-5level [%X{traceId}] %-20thread |%30.30c{30}:%-4line |%msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- <root>
+    &lt;!&ndash; <root>
         <appender-ref ref="ROLLING" />
-    </root> -->
+    </root> &ndash;&gt;
 
-    <!--console log-->
+    &lt;!&ndash;console log&ndash;&gt;
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread)|%green(%30.30c{30}:%-4line)|%highlight(%msg%n)</pattern>
@@ -46,6 +46,6 @@
     <root level="info">
         <appender-ref ref="ROLLING" />
         <appender-ref ref="STDOUT"/>
-    </root>
+    </root>-->
 
 </configuration>
