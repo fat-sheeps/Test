@@ -20,6 +20,7 @@ public class CommonService {
     public Object queryAllUser() {
         log.info("queryAllUser begin:");
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().ge(User::getId, 1);
         List<User> users = userMapper.selectList(queryWrapper);
         log.info("queryAllUser users:{}", JSON.toJSONString(users));
         return users;

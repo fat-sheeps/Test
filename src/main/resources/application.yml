@@ -60,8 +60,8 @@ mybatis-plus:
     # 如果项目之中实体统一使用IEnum或注解的方式,可配置成 com.baomidou.mybatisplus.extension.handlers.EnumTypeHandler,也可省略上面的type-enums-package配置
     # 配置type-enums-package只对注解方式的枚举处理能提前加载缓存.
     #default-enum-type-handler: com.baomidou.mybatisplus.extension.handlers.MybatisEnumTypeHandler
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL日志
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl #关闭SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL日志
+    #log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl #关闭SQL日志
   global-config:
     db-config:
       logic-not-delete-value: 1

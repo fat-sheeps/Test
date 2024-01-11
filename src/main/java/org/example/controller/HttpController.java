@@ -40,7 +40,7 @@ public class HttpController {
     private CommonService commonService;
 
 
-    private Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
+    private final Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     //方法入参和返回参数都必须与被服务降级的方法一致
     public Map<String, Object> paymentOkFallbackHandler(long time) {
@@ -55,7 +55,7 @@ public class HttpController {
 //        //value表示当前线程的超时时间为3s
 //        @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")})
     @RequestMapping(value = "/server")
-    public Object server(@RequestParam long time) throws InterruptedException {
+    public Object server(@RequestParam(required = false) long time) throws InterruptedException {
         log.error("error");
 //        log.info("Thread.currentThread().getName():{}", Thread.currentThread().getName());
 //        long start = System.currentTimeMillis();

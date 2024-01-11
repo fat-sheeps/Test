@@ -3,9 +3,12 @@ package org.example;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.github.f4b6a3.ulid.Ulid;
+import com.google.common.collect.Lists;
 import com.netflix.hystrix.*;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.core.util.UuidUtil;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.example.domain.DspHystrixCommand;
 import org.example.domain.User;
@@ -27,11 +30,14 @@ import java.lang.management.MemoryType;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 @Slf4j
@@ -68,7 +74,7 @@ public class Test1 {
         log.warn("{}warn!", "");
         log.debug("{}debug!", "");
         System.out.println(1);
-        User user = new User();
+//        User user = new User();
     }
 
     @Test
@@ -603,8 +609,6 @@ public class Test1 {
         }
 
         // 获取对象大小
-        long size = instrumentation.getObjectSize(new User());
-        System.out.println(size);
     }
 
     private static Instrumentation getInstrumentation() {
@@ -620,10 +624,76 @@ public class Test1 {
 
     @Test
     public void test23() {
+//        LocalDateTime date1 = LocalDate.parse("2024-01-08", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+//        LocalDateTime date2 = LocalDate.parse("2024-01-09", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().withHour(23).withMinute(59).withSecond(59);
+//        System.out.println(date1);
+//        System.out.println(date2);
+//        Duration duration = Duration.between(date1,date2);
+//        System.out.println(duration.toDays());
+//        LocalDateTime dd = date1.plusDays(90).withHour(23).withMinute(59).withSecond(59);
+//        System.out.println(dd);
         LocalDateTime date = LocalDateTime.now();
-        System.out.println(LocalDate.parse("2024-01-03", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
-        System.out.println(LocalDate.parse("2024-01-03", DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().withHour(23).withMinute(59).withSecond(59));
+        LocalDateTime dateUTC = LocalDateTime.now(ZoneId.of("UTC"));
+        System.out.println(date.withHour(23).withMinute(59).withSecond(59));
+        System.out.println(dateUTC.withHour(23).withMinute(59).withSecond(59));
 
+    }
+
+    @Test
+    public void test24() {
+        System.out.println(Math.round(5.0005D * 100.0) / 100.0);
+    }
+
+    @Test
+    public void test25() {
+        List<User> userList = new ArrayList<>();
+        User user1 = User.builder().id(1L).name("zhang").age(18).build();
+        User user2 = User.builder().id(2L).name("zhang").age(19).build();
+        User user3 = User.builder().id(3L).name("wang").age(18).build();
+        User user4 = User.builder().id(4L).name("wang").age(19).build();
+        User user5 = User.builder().id(5L).name("wang").age(19).build();
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+        userList.add(user4);
+        userList.add(user5);
+//        Map<String, List<User>> map = userList.stream().collect(Collectors.groupingBy(item -> item.getName() + item.getAge()));
+        System.out.println(JSON.toJSONString(userList));
+        System.out.println(JSON.toJSONString(Lists.partition(userList,2)));
+        System.out.println(JSON.toJSONString(Lists.newArrayList("1","2","3")));
+//        System.out.println(JSON.toJSONString(map));
+    }
+
+    @Test
+    public void test26() {
+        String email = "asd.qq@qq.com";
+        String[] emails = email.split(",");
+        for (String e : emails) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void test27() {
+        System.out.println(UuidUtil.getTimeBasedUuid());
+        System.out.println(UuidUtil.getTimeBasedUuid());
+        System.out.println(UuidUtil.getTimeBasedUuid());
+        System.out.println(UuidUtil.getTimeBasedUuid());
+        System.out.println(UuidUtil.getTimeBasedUuid());
+        System.out.println(UuidUtil.getTimeBasedUuid());
+
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+
+        System.out.println(Ulid.fast());
+        System.out.println(Ulid.fast());
+        System.out.println(Ulid.fast());
+        System.out.println(Ulid.fast());
+        System.out.println(Ulid.fast());
     }
 
 
