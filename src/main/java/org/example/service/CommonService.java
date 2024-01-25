@@ -1,5 +1,6 @@
 package org.example.service;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
@@ -28,5 +32,33 @@ public class CommonService {
     @Scheduled(cron = "0 * * * * ?")
     public void print() {
         log.info("Scheduled!");
+    }
+
+    @PostConstruct
+    public void init() {
+        System.out.println("tantan_request tantan_request.info");
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        List<String> futures = new ArrayList<>();
+        // 执行耗时操作，例如发送HTTP请求或数据库查询
+        for (int i = 0; i < 5; i++) {
+            Future<String> future = executor.submit(() -> {
+
+                SystemLogFactory.info("tantan_request","tantan_request.info");
+                SystemLogFactory.info("tantan_response","tantan_response.info");
+                SystemLogFactory.info("momo_request","momo_request.info");
+                SystemLogFactory.info("momo_response","momo_response.info");
+                return "Task completed";
+            });
+            String res;
+            try {
+                res = future.get(150, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+                //log.error("error:{}", e.getMessage());
+                res = "timeout!";
+            }
+            futures.add(res);
+
+        }
+
     }
 }

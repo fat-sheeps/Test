@@ -1,10 +1,11 @@
 package org.example;
 
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.f4b6a3.ulid.Ulid;
-import com.google.common.collect.Lists;
+import com.google.common.collect.*;
 import com.netflix.hystrix.*;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 @Slf4j
@@ -657,10 +660,12 @@ public class Test1 {
         userList.add(user3);
         userList.add(user4);
         userList.add(user5);
+
+        userList = userList.stream().filter(item->item.getAge() == 18).collect(Collectors.toList());
 //        Map<String, List<User>> map = userList.stream().collect(Collectors.groupingBy(item -> item.getName() + item.getAge()));
         System.out.println(JSON.toJSONString(userList));
-        System.out.println(JSON.toJSONString(Lists.partition(userList,2)));
-        System.out.println(JSON.toJSONString(Lists.newArrayList("1","2","3")));
+//        System.out.println(JSON.toJSONString(Lists.partition(userList,2)));
+//        System.out.println(JSON.toJSONString(Lists.newArrayList("1","2","3")));
 //        System.out.println(JSON.toJSONString(map));
     }
 
@@ -694,6 +699,112 @@ public class Test1 {
         System.out.println(Ulid.fast());
         System.out.println(Ulid.fast());
         System.out.println(Ulid.fast());
+    }
+
+    @Test
+    public void test28() {
+//        Map<String, String> map = Maps.newHashMap();
+//        map.put("1","2");
+//        map.put("2", null);
+//        map.put("3","2");
+//        map.values().removeIf(Objects::isNull);
+//
+//        System.out.println(map);
+        List<String> list = Arrays.asList("1","2");
+        List<String> list1 = Lists.newArrayList("1","2","3");
+        List<String> list2 = Arrays.asList("1","3");
+//        list2.remove("1");
+        System.out.println(list2);
+
+
+        Map<String, String> map = MapUtil.of("1","a");
+        map.put("a", null);
+        System.out.println(map);
+        map.values().removeIf(Objects::isNull);
+        map.put("aa", "asd");
+        System.out.println(map);
+
+
+        Map<String, String> map2 = MapUtil.builder(new HashMap<String, String>()).put("aa","bb").put("df", "rt").build();
+        map2.put("aar","bb");
+        System.out.println(map2);
+
+    }
+    @Test
+    public void test29() {
+        //冒泡排序
+        int[] arr = {1, 3, 5, 7, 9, 2, 4, 6, 8};
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = 0; j < arr.length - 1 - i; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+        System.out.println(Arrays.toString(arr));
+    }
+    @Test
+    public void test30() {
+        //邮箱格式校验
+        String emails = "qwe@vip.qq.com,liwen.tang@way.iotuty";
+        for (String email : emails.split(",")) {
+
+            if (email.matches("^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$")) {
+                System.out.println("邮箱格式正确");
+            } else {
+                System.out.println("邮箱格式错误");
+            }
+        }
+    }
+
+    @Test
+    public void test31() {
+        //当前时间加1天
+        // 获取当前时间
+        // 创建一个Calendar对象
+        Calendar calendar = Calendar.getInstance();
+        // 将当前时间添加一天
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        // 获取新的时间
+        Date date = calendar.getTime();
+        // 输出新的时间
+        System.out.println(date);
+        //获取当前时间
+//        Date date = new Date();
+//        System.out.println(date);
+
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+        System.out.println(localDateTime);
+    }
+
+    @Test
+    public void test32() {
+        String str = null;
+        System.out.println(Optional.ofNullable(str).orElse("aaa"));
+
+    }
+
+    @Test
+    public void test33() {
+        long start = System.currentTimeMillis();
+        int timeout = 0;
+        try {
+            //log.info("---------------开始-----------------{}", j);
+            DspHystrixCommand command = new DspHystrixCommand("group", "command" + timeout, 100);
+//                    log.info("{}",command);
+//                    log.info("{}",command.getThreadPoolKey());
+            String res = command.execute();
+            long end = System.currentTimeMillis();
+            log.info("-completed-限制timeout:" + timeout + ",执行time:" + (end - start) + "业务耗时：" + res);
+
+        } catch (HystrixRuntimeException e) {
+            //log.error(e.getMessage());
+            long end = System.currentTimeMillis();
+            log.info("-Hystrix-限制timeout:" + timeout + ",执行time:" + (end - start));
+        }
+
     }
 
 
