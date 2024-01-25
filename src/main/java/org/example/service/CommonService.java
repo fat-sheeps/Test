@@ -34,7 +34,7 @@ public class CommonService {
         log.info("Scheduled!");
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         System.out.println("tantan_request tantan_request.info");
         ExecutorService executor = Executors.newFixedThreadPool(5);
