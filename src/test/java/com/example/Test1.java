@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.example.domain.DspHystrixCommand;
 import com.example.domain.User;
 import com.example.enums.CountryEnum;
+import com.example.exception.BizCode;
+import com.example.exception.BizException;
 import com.example.utils.AES;
 import com.example.utils.HttpUtil;
 import com.example.utils.SystemUtil;
@@ -860,9 +862,40 @@ public class Test1 {
     public void test39() {
         System.out.println(Runtime.getRuntime().availableProcessors());
     }
+    @Test
+    public void test40() {
+        try {
+            extracted();
+        } catch (BizException e) {
+            log.error("e:{}",e.getErrorCode().getErrorCode());
+            log.error("e:{}",e.getMessage());
+        }
+    }
 
+    @Test
+    public void test41() {
+        System.out.println(StringUtils.right("vbnm", 30));
+    }
 
+    private static void extracted() {
+        int a = 0;
+        int b = 0;
+        int c = 0;
+        try {
+            c = a/b;
+        } catch (Exception e) {
+            throw new BizException(BizCode.DEFAULT, "error:" + e.getMessage());
+        }
+    }
 
+    @Test
+    public void test42() {
+        int i = 0;
+        System.out.println(i++);
+        System.out.println(i++);
+        System.out.println(i++);
+        System.out.println(i);
+    }
 
 
 }
