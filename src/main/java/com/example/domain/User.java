@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -31,6 +33,21 @@ public class User extends Model<User> {
 //    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
+    @TableField(exist = false)
+    private Date date;
+
 //    private List<Integer> types;
+
+    @TableField(exist = false)
+    private int priority;
+    @TableField(exist = false)
+    private float priorityPercent;
+    @TableField(exist = false)
+    private List<SubUser> subUsers;
+
+
+
+
+
 
 }

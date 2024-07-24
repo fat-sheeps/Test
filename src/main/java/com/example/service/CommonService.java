@@ -27,7 +27,7 @@ public class CommonService {
         log.info("queryAllUser users:{}", JSON.toJSONString(users));
         return users;
     }
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "58 0/1 * * * ?")
     public void print() {
         log.info("Scheduled!");
     }
