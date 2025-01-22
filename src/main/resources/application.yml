@@ -3,13 +3,18 @@ spring:
     name: test-web
   profiles:
     active: dev
+  main:
+    allow-bean-definition-overriding: true
 #--spring.profiles.active=dev
 server:
   port: 8080
   #undertow 配置
   undertow:
-    io-threads: 16
-    worker-threads: 128
+    threads:
+      # 设置Undertow的核心线程数
+      io: 1
+      # 设置Undertow的最大工作线程数
+      worker: 1
     direct-buffers: true
     max-http-post-size: 90000
   compression:
@@ -17,7 +22,11 @@ server:
     min-response-size: 40960
     #tomcat配置
   tomcat:
-    max-threads: 500
+    max-threads: 1
+#swagger登录用户名密码
+swagger:
+  username: admin
+  password: admin123
 
 #日志相关
 logging:

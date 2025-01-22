@@ -1,17 +1,23 @@
 package com.example.config;
 
 import com.alibaba.fastjson.JSONObject;
+import io.undertow.servlet.attribute.ServletRequestAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,10 +38,16 @@ public class ControllerExecutionTimeAspect {
     @Pointcut("execution(* com.example.controller..*.*(..))")
     public void pointcut() {
     }
+    @Before("pointcut()")
+    public void before(JoinPoint joinPoint) {
+    }
 
     // 环绕通知，用于计算方法的执行时间
     @Around("pointcut()")
     public Object pointcut(ProceedingJoinPoint joinPoint) throws Throwable {
+        ServletRequestAttributes requestAttribute = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttribute.getRequest();
+        log.info("begin req ... {},{},{}", request.getHeader("X-Forwarded-For"), request.getHeader("X-Real-IP"), request.getHeader("User-Agent"));
         long start = System.currentTimeMillis();
         Signature signature = joinPoint.getSignature();
         Class clazz = signature.getDeclaringType();
@@ -54,12 +66,11 @@ public class ControllerExecutionTimeAspect {
         // 记录类名和方法名
         logInfo.append("| Class Method   : ").append(signature.getDeclaringTypeName()).append(".").append(method).append("(").append(clazz.getSimpleName()).append(".java:")
                 .append(num).append(")");
-        log.info("{} took {} ms to execute.", logInfo, elapsedTime);
-
+        log.info("end req ...{} took {} ms to execute. params:{} ", logInfo, elapsedTime, getParam(joinPoint));
         return result;
     }
 
-    @Around("pointcut()")
+    /*@Around("pointcut()")
     public Object pointcut2(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         Signature signature = joinPoint.getSignature();
@@ -75,7 +86,7 @@ public class ControllerExecutionTimeAspect {
         log.info("{} took {} ms to execute.", logInfo, elapsedTime);
 
         return result;
-    }
+    }*/
 
 
 
@@ -125,9 +136,15 @@ public class ControllerExecutionTimeAspect {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         Object[] values = joinPoint.getArgs();
         String[] names = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
+
         for (int i = 0; i < names.length; i++) {
+            // 跳过HttpServletRequest对象
+            if (values[i] instanceof HttpServletRequest || values[i] instanceof HttpServletResponse) {
+                continue;
+            }
             map.put(names[i], values[i]);
         }
+
         return JSONObject.toJSONString(map);
     }
 }

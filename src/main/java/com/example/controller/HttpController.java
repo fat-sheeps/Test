@@ -70,6 +70,12 @@ public class HttpController {
         return commonService.queryAllUser();
     }
 
+    @RequestMapping(value = "/queryForPage")
+    public Object queryForPage(){
+
+        return commonService.queryForPage();
+    }
+
     @RequestMapping(value = "/hello")
     public Object hello() throws InterruptedException {
 //        long start = System.currentTimeMillis();

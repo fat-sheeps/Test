@@ -1,10 +1,10 @@
 package com.example.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.domain.TbUser;
 import org.apache.ibatis.annotations.Mapper;
-import com.example.domain.User;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface UserMapper extends BaseMapper<TbUser> {
 
 }

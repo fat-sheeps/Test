@@ -22,7 +22,8 @@
         <project.reporting.outPutEncoding>UTF-8</project.reporting.outPutEncoding>
         <java.version>1.8</java.version>
         <springboot-version>2.7.0</springboot-version>
-        <hutool-version>5.3.1</hutool-version>
+<!--        <hutool-version>5.8.7</hutool-version> 请求http://localhost:8888/imp?id=1&name=提升-30%&ua=ua 会报错-->
+        <hutool-version>5.7.8</hutool-version>
         <fastjson-version>1.2.49</fastjson-version>
         <springfox-swagger-version>2.6.1</springfox-swagger-version>
         <lombok.version>1.18.8</lombok.version>
@@ -67,21 +68,20 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
-            </exclusions>
-            <!--<exclusions>
-                &lt;!&ndash;以tomcat服务器启动 spring-boot-starter-tomcat&ndash;&gt;
+                <!--以undertow服务器启动 剔除tomcat spring-boot-starter-tomcat-->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
-            </exclusions>-->
+            </exclusions>
+
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
         <!--以undertow服务器启动 spring-boot-starter-undertow-->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
             <version>${springboot-version}</version>
@@ -95,7 +95,7 @@
                     <artifactId>spring-boot-starter-log4j2</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
         <!-- Testing Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -135,12 +135,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-version}</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
+            <version>4.5.3</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcomponents-core</artifactId>
             <version>4.4.14</version>
@@ -184,17 +184,76 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.11</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-compiler</artifactId>
             <version>1.7.5</version>
-        </dependency>
+        </dependency>-->
         <!--钉钉机器人-->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dingtalk</artifactId>
             <version>2.1.14</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!--ocr-->
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>4.5.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--lettuce-->
+        <dependency>
+            <groupId>biz.paluch.redis</groupId>
+            <artifactId>lettuce</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.19.2</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.tencent.ads</groupId>
+            <artifactId>marketing-api-java-sdk</artifactId>
+            <version>1.1.89</version>
+        </dependency>
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>2.12.0</version>  <!-- 请检查最新版本 -->
+        </dependency>
+
+
     </dependencies>
 
     <build>

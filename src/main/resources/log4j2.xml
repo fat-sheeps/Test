@@ -10,7 +10,7 @@
         <console name="console" target="SYSTEM_OUT" >
             <!--%yellow(%d) %white(%-5level) %magenta([%X{traceId}]) %cyan(%-20thread)|%green(%30.30c{30}:%-4line)|%highlight(%msg%n)-->
             <PatternLayout
-                    pattern="%style{%d{ISO8601}}{yellow} %style{%-5level}{white}[%style{%-20thread}{cyan}][%style{%X{traceId}}{magenta}][%style{%30.30c{30}:%-4line}{green}]%style{%msg%n}{blue}%style{%throwable}{red}"
+                    pattern="%style{%d}{yellow} %style{%-5level}{white}[%style{%-20thread}{cyan}][%style{%X{traceId}}{magenta}][%style{%30.30c{30}:%-4line}{green}] %style{%msg%n}{blue}%style{%throwable}{red}"
                     disableAnsi="false" noConsoleNoAnsi="false"/>
         </console>
 

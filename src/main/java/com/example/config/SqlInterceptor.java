@@ -1,5 +1,6 @@
 package com.example.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -34,6 +35,7 @@ import java.util.Properties;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})}
 )
+@Slf4j
 public class SqlInterceptor implements Interceptor {
 
     private static final ThreadLocal<SimpleDateFormat> dateTimeFormatter = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -171,7 +173,6 @@ public class SqlInterceptor implements Interceptor {
             result.append("<==  Total: ").append(obj);
         }
         result.append("  Spend Time ==> ").append(costTime).append(" ms");
-        Logger log = LoggerFactory.getLogger(sqlId);
         log.info(sqlLog);
         log.info(result.toString());
     }

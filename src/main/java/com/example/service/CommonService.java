@@ -2,10 +2,14 @@ package com.example.service;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.domain.User;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.domain.TbUser;
+import com.example.domain.UserEvent;
 import com.example.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,15 +23,29 @@ public class CommonService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
     public Object queryAllUser() {
         log.info("queryAllUser begin:");
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().ge(User::getId, 1);
-        List<User> users = userMapper.selectList(queryWrapper);
+        QueryWrapper<TbUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().ge(TbUser::getAge, 0);
+        List<TbUser> users = userMapper.selectList(queryWrapper);
         log.info("queryAllUser users:{}", JSON.toJSONString(users));
+        for (TbUser user : users) {
+            applicationEventPublisher.publishEvent(new UserEvent(this, user.getId() + ""));
+        }
+        log.info("queryAllUser end");
         return users;
     }
-    @Scheduled(cron = "58 0/1 * * * ?")
+
+    public Object queryForPage() {
+        log.info("queryForPage begin:");
+        QueryWrapper<TbUser> queryWrapper = new QueryWrapper<>();
+        Page<TbUser> page = new Page<>(1, 3);
+        IPage<TbUser> users = userMapper.selectPage(page, queryWrapper);
+        return users;
+    }
+    //@Scheduled(cron = "58 0/1 * * * ?")
     public void print() {
         log.info("Scheduled!");
     }

@@ -29,7 +29,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.util.UuidUtil;
-import org.apache.tomcat.util.codec.binary.Base64;
+//import org.apache.tomcat.util.codec.binary.Base64;
 import com.example.utils.MDCUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.DigestUtils;
@@ -255,7 +255,7 @@ public class Test1 {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] plaintext = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
             // 执行操作
-            return Base64.encodeBase64URLSafeString(plaintext);
+            return Base64.getEncoder().encodeToString(plaintext);
         } catch (Exception ex) {
             return null;
         }
@@ -746,6 +746,10 @@ public class Test1 {
         Map<String, String> map2 = MapUtil.builder(new HashMap<String, String>()).put("aa","bb").put("df", "rt").build();
         map2.put("aar","bb");
         System.out.println(map2);
+
+        Map<String, String> map3 = new HashMap<String, String>(){ {put("aa","bb");put("df", "rt");}};
+        map3.put("aar","bb");
+        System.out.println(map3);
 
     }
     @Test
@@ -1652,7 +1656,8 @@ public class Test1 {
 
     @Test
     public void test71() {
-        String[] array = Arrays.stream(CountryEnum.values()).map(CountryEnum::getName).toArray(String[]::new);
+        List<String> list = Arrays.asList("1", "2", "3");
+        String[] array = list.toArray(new String[0]);
         System.out.println(JSON.toJSONString(array));
     }
 

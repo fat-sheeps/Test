@@ -1,5 +1,6 @@
 package com.example;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,6 +18,17 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+        //CacheData.readFile();
+        addShutdownHook();
+    }
+    public static void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("---------------------------shutdown hook---------------------------");
+            String value = JSON.toJSONString(CacheData.getList());
+            //写入文件
+            CacheData.writeFile(value);
+            log.info("---------------------------shutdown hook---------------------------");
+        }));
     }
 
 }
