@@ -38,29 +38,31 @@ public class TestController {
         String m5 = request.getParameter("m5");
         boolean isOverCount = false;
 
-//        try {
-//            int m2Count = Integer.parseInt(countMap.get("m2_" + m2));
-//            countMap.put("m2_" + m5, String.valueOf(m2Count + 1));
-//            totalCount += m2Count;;
-//            isOverCount = totalCount >= fcNum;
-//
-//            if (!isOverCount) {
-//                int m2ChnCount = Integer.parseInt(countMap.get("m2Chn_" + m2Chn));
-//                countMap.put("m2Chn_" + m5, String.valueOf(m2ChnCount + 1));
-//                totalCount += m2ChnCount;
-//                isOverCount = totalCount >= fcNum;
-//            }
-//
-//            if (!isOverCount) {
-//                int m5Count = Integer.parseInt(countMap.get("m5_" + m5));
-//                countMap.put("m5_" + m5, String.valueOf(m5Count + 1));
-//                totalCount += m5Count;
-//                isOverCount = totalCount >= fcNum;
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("error get fc count: " + e);
-//        }
+        try {
+            int m2Count = Integer.parseInt(countMap.get("m2_" + m2));
+            countMap.put("m2_" + m5, String.valueOf(m2Count + 1));
+            totalCount += m2Count;;
+            isOverCount = totalCount >= fcNum;
+
+            if (!isOverCount) {
+                String m2Chn = "";
+                // TODO
+                int m2ChnCount = Integer.parseInt(countMap.get("m2Chn_" + m2Chn));
+                countMap.put("m2Chn_" + m5, String.valueOf(m2ChnCount + 1));
+                totalCount += m2ChnCount;
+                isOverCount = totalCount >= fcNum;
+            }
+
+            if (!isOverCount) {
+                int m5Count = Integer.parseInt(countMap.get("m5_" + m5));
+                countMap.put("m5_" + m5, String.valueOf(m5Count + 1));
+                totalCount += m5Count;
+                isOverCount = totalCount >= fcNum;
+            }
+
+        } catch (Exception e) {
+            log.error("error get fc count: " + e);
+        }
 
         return isOverCount;
     }
