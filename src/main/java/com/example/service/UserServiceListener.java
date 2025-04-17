@@ -13,6 +13,7 @@ public class UserServiceListener {
     @EventListener
     public void onApplicationEvent(UserEvent userEvent) throws InterruptedException {
         Thread.sleep(1000);
+        String userId;
         log.info("UserServiceListener userId:{}", userEvent.getUserId());
     }
 }

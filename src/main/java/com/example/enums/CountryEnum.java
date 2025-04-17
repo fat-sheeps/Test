@@ -1,7 +1,9 @@
 package com.example.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Getter
 public enum CountryEnum {
     NONE(0, "-"),
@@ -16,10 +18,7 @@ public enum CountryEnum {
     private final Integer code;
     private final String name;
 
-    CountryEnum(Integer code, String name) {
-        this.code = code;
-        this.name = name;
-    }
+
 
     public static CountryEnum getCountryEnum(int index) {
         CountryEnum[] myArray = CountryEnum.values();

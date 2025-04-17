@@ -2,15 +2,18 @@ package com.example.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.example.CacheData;
+import com.example.Result;
 import com.example.service.CommonService;
 import com.example.service.DemoService;
 import com.example.service.TaskService;
 import com.example.utils.ExchangeRateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
@@ -25,9 +28,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -86,6 +92,7 @@ public class DemoController {
     public Object imp(HttpServletRequest httpServletRequest, HttpServletResponse response,
                       @RequestParam(value = "id", required = false) String id,
                       @RequestParam(value = "name", required = false) String name,
+                      @RequestParam(value = "localDateTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")  LocalDateTime localDateTime,
                       @RequestBody(required = false)  Request request) throws InterruptedException {
         // 获取ua
         String ua = httpServletRequest.getHeader("User-Agent");
@@ -114,6 +121,8 @@ public class DemoController {
     public static class Request {
         private String id;
         private String name;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+        private LocalDateTime localDateTime;
 
         private String pid;
         private String pname;
@@ -210,6 +219,16 @@ public class DemoController {
         Thread.sleep(30000);
         return "ok";
     }
+
+    @GetMapping(value = "/result")
+    public Result<List<String>> result(@RequestParam(required = false) Long time) {
+
+        if (time != null) {
+            return Result.success(new ArrayList<>());
+        }
+        return Result.fail("error");
+    }
+
 
 
 }

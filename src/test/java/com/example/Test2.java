@@ -1,31 +1,31 @@
 package com.example;
 
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.bloomfilter.bitMap.IntMap;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.crypto.digest.BCrypt;
-import cn.hutool.crypto.digest.MD5;
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.pinyin.PinyinEngine;
+import cn.hutool.extra.pinyin.PinyinUtil;
+import cn.hutool.extra.pinyin.engine.pinyin4j.Pinyin4jEngine;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
+import cn.hutool.jwt.JWTUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.example.domain.DspProtoSurge;
 import com.example.domain.Student;
 import com.example.domain.SubUser;
-import com.example.domain.User;
+import com.example.utils.AutoResetFlag;
 import com.example.utils.OKHttpUtil;
 import com.example.utils.UrlUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -39,20 +39,19 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
-import org.apache.commons.codec.Encoder;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.HtmlUtils;
-import sun.security.util.Password;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -76,6 +75,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -190,12 +190,15 @@ public class Test2 {
     @Test
     public void test10() {
         //passwordBCrypt 等效于springframework中的passwordEncoder
-        System.out.println(BCrypt.hashpw("wayio!@#", BCrypt.gensalt(10)));
-        System.out.println(BCrypt.hashpw("123456", BCrypt.gensalt(10)));
-        System.out.println(BCrypt.hashpw("123456", BCrypt.gensalt(10)));
-        System.out.println(BCrypt.checkpw("123456", "$2a$10$0Ey1/OlxXOIdskH5OAmMEeHGkwk4PX3yVZfB3iKQhmaXxP2ZY34Zu"));
-        System.out.println(BCrypt.checkpw("123456", "$2a$10$pq57s90cc/HKR4N5s374X.h8zpWv/UP0KgqIXx5TDC9jcjJUKRaAC"));
-        System.out.println(BCrypt.checkpw("wayio!@#", "$2a$10$P3VQkycM/uHv5NgR.SZYX.WVuspjaq3DEru0PLacOUNoJZg.QZBA."));
+//        System.out.println(BCrypt.hashpw("wayio!@#", BCrypt.gensalt(10)));
+//        System.out.println(BCrypt.hashpw("123456", BCrypt.gensalt(10)));
+//        System.out.println(BCrypt.hashpw("123456", BCrypt.gensalt(10)));
+//        System.out.println(BCrypt.checkpw("123456", "$2a$10$0Ey1/OlxXOIdskH5OAmMEeHGkwk4PX3yVZfB3iKQhmaXxP2ZY34Zu"));
+//        System.out.println(BCrypt.checkpw("123456", "$2a$10$pq57s90cc/HKR4N5s374X.h8zpWv/UP0KgqIXx5TDC9jcjJUKRaAC"));
+//        System.out.println(BCrypt.checkpw("wayio!@#", "$2a$10$P3VQkycM/uHv5NgR.SZYX.WVuspjaq3DEru0PLacOUNoJZg.QZBA."));
+
+//        System.out.println(BCrypt.hashpw("q1w2e3r4", BCrypt.gensalt(10)));
+        System.out.println(BCrypt.checkpw("q1w2e3r4", "$2a$10$OelzJgfc/YARga6Ebw6cTOt0CpKnBH9ofEyp0y.OAv6gZz07i80Xi"));
     }
 
     @Data
@@ -208,6 +211,10 @@ public class Test2 {
         private int count;
 
         private double price;
+
+        public int getCount() {
+            return count;
+        }
     }
 
     @Test
@@ -1557,7 +1564,7 @@ public class Test2 {
                 b.getDesc().put(key, "");
             }
         });
-        System.out.println(b);
+        System.out.println(JSON.toJSONString(b));
     }
 
     @Test
@@ -1666,5 +1673,651 @@ public class Test2 {
 
     }
 
+    @Test
+    public void test67() {
+        IntMap intMap = new IntMap(3);
+        System.out.println(JSON.toJSONString(intMap));
+        intMap.add(11);
+        intMap.add(12);
+        intMap.add(13);
+        intMap.add(14);
+        intMap.add(15);
+        System.out.println(intMap.contains(15));
+        intMap.remove(14);
+        System.out.println(intMap.contains(14));
+        //输出intMap中的值
 
+        System.out.println(intMap);
+    }
+
+    @Test
+    public void test68() {
+        float num1 = 0.1f;
+        float num2 = 0.8f;
+        float sum = num1 + num2;
+        Thread.yield();
+        System.out.println(sum);
+    }
+    @Test
+    public void test69() {
+        System.out.println(addStr("12", "12"));
+        System.out.println(addStr("122", "12"));
+
+        System.out.println(addStr("12|34", "12"));
+        System.out.println(addStr("1|12|4", "12"));
+        System.out.println(addStr("4|12", "12"));
+
+        System.out.println(addStr("4|3", "12"));
+        System.out.println(addStr("", "12"));
+        System.out.println(addStr(null, "12"));
+    }
+
+    private String addStr(String str, String a) {
+        if (StringUtils.isBlank(str)) {
+            str = a;
+        } else if (str.endsWith("|" + a) || str.startsWith(a + "|") || str.contains("|" + a + "|") || str.equals(a)) {
+
+        } else {
+            str += "|" + a;
+        }
+        return str;
+    }
+
+    @Test
+    public void test70() {
+        Set<String> set = new HashSet<>(Collections.singletonList("1"));
+        set.add("2");
+        System.out.println(set);
+    }
+    @Test
+    public void test71() {
+        Integer date = 20250207;
+        System.out.println(DateUtil.format(DateUtil.parse(date.toString(), "yyyyMMdd"), "yyyy-MM-dd"));
+    }
+    @Test
+    public void test72() {
+        Map<BigInteger, BigInteger> map = new HashMap<>();
+        map.put(BigInteger.valueOf(1), BigInteger.valueOf(123));
+        map.put(BigInteger.valueOf(2), BigInteger.valueOf(222));
+        map.put(BigInteger.valueOf(3), BigInteger.valueOf(333));
+        map.put(BigInteger.valueOf(518), BigInteger.valueOf(1));
+        map.put(BigInteger.valueOf(7), BigInteger.valueOf(4683));
+        map.put(BigInteger.valueOf(8), BigInteger.valueOf(1172));
+        System.out.println(map);
+        //按照key的大小排序输出
+        Map<BigInteger, BigInteger> sortedMap  = map.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+//        String str = formatMap(map);
+
+        System.out.println(sortedMap);
+    }
+
+    @Test
+    public void test73() throws UnsupportedEncodingException {
+        String str = "127.0.0.1:8888/imp?id=1&name=zhang%san";
+//        System.out.println(URLEncoder.encode(str, "UTF-8"));
+
+        String res = HttpUtil.get(str);
+        System.out.println(res);
+//        String decode = URLDecoder.decode("127.0.0.1%3A8888", Charset.defaultCharset());
+//        System.out.println(decode);
+        //String aaa = "% %%";
+
+    }
+
+    @Test
+    public void test74() {
+        Map<Integer, String> map = new HashMap<>();
+        map.put(1, "1");
+        map.put(2, "2");
+        map.put(3, "3");
+        map.put(4, "4");
+        map.put(6, "6");
+        map.put(7, "7");
+        map.put(518, "518");
+        map.put(5, "5");
+        System.out.println(map);
+        TreeMap<Integer, String> map1 = new TreeMap<>();
+        map1.put(2, "2");
+        map1.put(1, "1");
+        map1.put(3, "3");
+        map1.put(4, "4");
+        map1.put(6, "6");
+        map1.put(7, "7");
+        map1.put(518, "518");
+        map1.put(5, "5");
+        System.out.println(map1.containsKey(1));
+        System.out.println(map1);
+        LinkedHashMap<Integer, String> map2 = new LinkedHashMap<>();
+        map2.put(2, "2");
+        map2.put(1, "1");
+        map2.put(3, "3");
+        map2.put(4, "4");
+        map2.put(6, "6");
+        map2.put(7, "7");
+        map2.put(518, "518");
+        map2.put(5, "5");
+        System.out.println(map2);
+
+    }
+    @Test
+    public void test75() {
+        LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+        map.put(2, "2");
+        map.put(1, "1");
+        map.put(3, "3");
+        map.put(4, "4");
+        map.put(6, "6");
+        map.put(7, "7");
+        map.put(518, "518");
+        map.put(5, "5");
+        System.out.println(map.keySet() + "," + map.values());
+        System.out.println(map);
+    }
+
+    @Test
+    public void test76() {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("uid",123);
+        payload.put("expire_time", System.currentTimeMillis() + 3600*1000);
+        String token = JWTUtil.createToken(payload, "qwerty".getBytes());
+        System.out.println(token);
+
+        cn.hutool.jwt.JWT jwt = JWTUtil.parseToken(token);
+        Integer uid = (Integer) jwt.getPayload("uid");
+        Long time = (Long) jwt.getPayload("expire_time");
+        System.out.println(uid);
+        System.out.println(time);
+    }
+    @Test
+    public void test77() {
+        System.out.println(Arrays.toString(ClassUtil.getDeclaredFields(User.class)));
+        System.out.println(Arrays.toString(ClassUtil.getClasses(new User())));
+        System.out.println(ClassUtil.getShortClassName("User"));
+        System.out.println(ClassUtil.getClassName(User.class, true));
+        System.out.println(ClassUtil.getClassName(User.class, false));
+        System.out.println(Arrays.toString(ClassUtil.getPublicMethods(User.class)));
+    }
+    @Test
+    public void test78() {
+        System.out.println(PinyinUtil.getPinyin("张三 重庆"));//zhang san   zhong qing
+        System.out.println(PinyinUtil.getPinyin("你好世界 hello word!"));//ni hao shi jie   h e l l o   w o r d !
+        System.out.println(PinyinUtil.getPinyin("䍒 罧"));//䍒   lin//䍒mou   罧shen
+
+        PinyinEngine engine = new Pinyin4jEngine(); // 使用pinyin4j
+        System.out.println(engine.getPinyin("重庆 你好世界 hello word!", ""));//zhongqing nihaoshijie hello word!
+
+        System.out.println(DesensitizedUtil.chineseName("张三李四"));//张***
+        System.out.println(DesensitizedUtil.idCardNum("130777777777777777", 1, 1));//1****************7
+        System.out.println(DesensitizedUtil.mobilePhone("18888888888"));//188****8888
+        System.out.println(DesensitizedUtil.address("北京市朝阳区是是多少是的是的", 10));//北京市朝**********
+        System.out.println(DesensitizedUtil.idCardNum("130777777777777777", 2, 3));//13*************777
+
+        Map<String, String> map = new HashMap<String, String>(){{put("1", "1");}};
+        System.out.println(CollUtil.isEmpty(map));
+        List<String> list = new ArrayList<String> () {{add("0");}};
+        List<String> list1 = new ArrayList<String> () {{add("0"); add("1");}};
+        //取交集
+        System.out.println(CollUtil.intersection(list, list1));
+    }
+    @Test
+    public void testDateUtil() {
+        System.out.println(DateUtil.parseDate("2025-03-04"));
+        System.out.println(DateUtil.parseDateTime("2025-03-04 10:13:54").toDateStr());
+    }
+    @Test
+    public void test79() {
+        Long a  = 111L;
+        Long b  = 1134L;
+        System.out.println(a - b);
+    }
+    public String tableStr(String tableStyle, List<LinkedHashMap<Integer, Integer>> list) {
+        //放到表格中
+        StringBuilder tableStr = new StringBuilder("<table ");
+        tableStr.append(tableStyle).append(">");
+        for (LinkedHashMap<Integer, Integer> linkedHashMap : list) {
+            tableStr.append("<tr bgcolor=\"#EFEFEF\">");
+            for (Map.Entry<Integer, Integer> entry : linkedHashMap.entrySet()) {
+                tableStr.append("<th>").append(entry.getKey()).append("</th>");
+            }
+            tableStr.append("</tr>");
+            tableStr.append("<tr>");
+            for (Map.Entry<Integer, Integer> entry : linkedHashMap.entrySet()) {
+                tableStr.append("<td>").append(entry.getValue()).append("</td>");
+            }
+            tableStr.append("</tr>");
+        }
+
+        tableStr.append("</table>");
+
+        return tableStr.toString();
+    }
+
+    public String tableStr2(String tableStyle, List<LinkedHashMap<Integer, Integer>> list) {
+        //放到表格中
+        StringBuilder tableStr = new StringBuilder("<table ");
+        String trStr = "<tr bgcolor=\"#EFEFEF\">";
+        String trStr1 = "<tr>";
+        tableStr.append(tableStyle).append(">");
+        int i = 0;//0:偶数 1 奇数
+        for (LinkedHashMap<Integer, Integer> map : list) {
+            if (i == 0) {
+                tableStr.append(trStr);
+            } else {
+                tableStr.append(trStr1);
+            }
+            for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+                tableStr.append("<th>").append(entry.getKey()).append("=").append(entry.getValue()).append("</th>");
+            }
+            tableStr.append("</tr>");
+            i = i == 0 ? 1 : 0;
+        }
+
+        tableStr.append("</table>");
+
+        return tableStr.toString();
+    }
+
+    /**
+     * 将map分割成bucket长度的组放到list中
+     * @param map
+     * @param bucket
+     * @return List<LinkedHashMap<Integer, Integer>>
+     */
+    private static List<LinkedHashMap<Integer, Integer>> splitToMapList(LinkedHashMap<Integer, Integer> map, int bucket) {
+
+        List<LinkedHashMap<Integer, Integer>> list = new ArrayList<>();
+
+        if (CollUtil.isEmpty(map)) {
+            return list;
+        }
+
+        List<Integer> keys = new ArrayList<>(map.keySet());
+        List<Integer> values = new ArrayList<>(map.values());
+
+        int size = map.size();
+        for (int i = 0; i < size; i += bucket) {
+            LinkedHashMap<Integer, Integer> subMap = new LinkedHashMap<>();
+            int end = Math.min(i + bucket, size);
+            for (int j = i; j < end; j++) {
+                subMap.put(keys.get(j), values.get(j));
+            }
+            list.add(subMap);
+        }
+        return list;
+    }
+
+    @NotNull
+    private static LinkedHashMap<Integer, Integer> getLinkedHashMap() {
+        String str = "1=13513153, 2=6697519, 3=30460192, 4=14003414, 5=1395425, 6=412056, 7=13035, 8=3446, 9=1447, 10=892, 11=581, 12=313, 13=202, 14=175, 15=123, 16=98, 17=82, 18=103, 19=92, 20=57, 21=57, 22=42, 23=35, 24=31, 25=36, 26=41, 27=36, 28=30, 29=22, 30=29, 31=21, 32=27, 33=19, 34=23, 35=14, 36=25, 37=12, 38=19, 39=12, 40=16, 41=15, 42=15, 43=17, 44=15, 45=9, 46=14, 47=11, 48=18, 49=11, 50=22, 51=11, 52=9, 53=10, 54=7, 55=7, 56=13, 57=8, 58=9, 59=11, 60=12, 61=17, 62=11, 63=6, 64=13, 65=7, 66=12, 67=7, 68=6, 69=9, 70=6, 71=8, 72=11, 73=5, 74=7, 75=4, 76=9, 77=8, 78=6, 79=5, 80=7, 81=7, 82=5, 83=3, 84=4, 85=5, 86=4, 87=8, 88=4, 89=5, 90=3, 91=3, 92=7, 93=8, 94=1, 95=3, 96=5, 97=5, 98=3, 99=6, 100=4, 101=7, 102=2, 103=5, 104=4, 105=8, 106=3, 107=4, 108=5, 109=4";
+        LinkedHashMap<Integer, Integer> map = new LinkedHashMap<>();
+        //将str中的key value 放到map中
+        String[] split = str.split(", ");
+        for (String s : split) {
+            String[] split1 = s.split("=");
+            map.put(Integer.parseInt(split1[0]), Integer.parseInt(split1[1]));
+        }
+        return map;
+    }
+
+    @Test
+    public void testMailUtil() {
+        MailAccount account = new MailAccount();
+        account.setHost("smtp.qq.com");
+        account.setPort(465);
+        account.setAuth(true);
+        account.setFrom("1006884993@qq.com");
+        account.setUser("1006884993@qq.com");
+        account.setPass("edxisnfuiwvnbdbf");
+        account.setSslEnable(true);
+
+        String advName = "南孚";
+        String title1 = "<h4> " + advName + "截止到当前小时2025-03-04 17:00:00的频次数据</h4>";
+        //获取mapList
+        LinkedHashMap<Integer, Integer> map = getLinkedHashMap();
+        List<LinkedHashMap<Integer, Integer>> list = splitToMapList(map, 20);
+        //table边框合并
+        String content1 = tableStr("border='1' style=\"border-collapse: collapse;\"", list);
+
+        String title2 = "<h4> 截止到上个小时2025-03-04 16:00:00的频次数据</h4>";
+        LinkedHashMap<Integer, Integer> map2 = new LinkedHashMap<Integer, Integer>() {{
+            put(1, 1);
+            put(2, 2);
+            put(3, 3);
+            put(4, 4);
+            put(5, 5);
+            put(6, 6);
+        }};
+        List<LinkedHashMap<Integer, Integer>> list2 = splitToMapList(map2, 5);
+        String content2 = tableStr("border='1'", list2);
+
+//        String res = MailUtil.send(account, "fei.wang@way.io", advName + "测试邮件 截止到当前小时频次数据-17", title1 + content1 + title2 + content2, true);
+//        System.out.println(res);
+        System.out.println(title1 + content1 + title2 + content2);
+    }
+
+    @Test
+    public void testMailUtil2() {
+
+
+        String advName = "南孚";
+        String title1 = "<h4> " + advName + "截止到当前小时2025-03-04 17:00:00的频次数据</h4>";
+        //获取mapList
+        LinkedHashMap<Integer, Integer> map = getLinkedHashMap();
+        List<LinkedHashMap<Integer, Integer>> list = splitToMapList(map, 20);
+        //table边框合并
+        String content1 = map.toString();
+
+        String title2 = "<h4> 截止到上个小时2025-03-04 16:00:00的频次数据</h4>";
+        LinkedHashMap<Integer, Integer> map2 = new LinkedHashMap<Integer, Integer>() {{
+            put(1, 1);
+            put(2, 2);
+            put(3, 3);
+            put(4, 4);
+            put(5, 5);
+            put(6, 6);
+        }};
+        List<LinkedHashMap<Integer, Integer>> list2 = splitToMapList(map2, 5);
+        String content2 = map2.toString();
+
+        System.out.println(title1 + content1 + title2 + content2);
+    }
+    @Test
+    public void testMailUtil3() {
+
+
+        String advName = "南孚";
+        String title1 = "<h4> " + advName + "截止到当前小时2025-03-04 17:00:00的频次数据</h4>";
+        //获取mapList
+        LinkedHashMap<Integer, Integer> map = getLinkedHashMap();
+        List<LinkedHashMap<Integer, Integer>> list = splitToMapList(map, 20);
+        //table边框合并
+        String content1 = tableStr2("border='1' style=\"border-collapse: collapse;\"", list);
+
+        String title2 = "<h4> 截止到上个小时2025-03-04 16:00:00的频次数据</h4>";
+        LinkedHashMap<Integer, Integer> map2 = new LinkedHashMap<Integer, Integer>() {{
+            put(1, 1);
+            put(2, 2);
+            put(3, 3);
+            put(4, 4);
+            put(5, 5);
+            put(6, 6);
+        }};
+        List<LinkedHashMap<Integer, Integer>> list2 = splitToMapList(map2, 5);
+        String content2 = tableStr2("border='1'", list2);
+
+        System.out.println(title1 + content1 + title2 + content2);
+    }
+
+    @Test
+    public void test80() {
+        float a = 0.42f * 9 * 13;
+        float b = 0.42f * 10 * 13;
+        System.out.println(a);
+        System.out.println(b);
+    }
+
+    @Test
+    public void test81() {
+        TreeMap<String, String> map = new TreeMap<>();
+        map.put("20230111", "3");
+        map.put("20211207", "1");
+        map.put("20220111", "2");
+
+        //取出key最大的
+        String s = map.lastKey();
+        System.out.println(s);
+        System.out.println(map.get(s));
+    }
+    @Test
+    public void test82() {
+        List<User> list = new ArrayList<>();
+        for (long i = 0; i < 4; i++) {
+            User user = new User();
+            user.setId(i);
+            user.setName("name" + i);
+            user.setCount((int) i);
+            user.setPrice(i);
+            list.add(user);
+        }
+        User user = new User();
+        user.setId(3L);
+        user.setName("name3");
+        user.setCount(3);
+        list.add(user);
+//        Map<Long, User> map = list.stream().collect(Collectors.toMap(User::getId, Function.identity(), (existing, replacement) -> replacement));
+        Map<Long, User> map = list.stream().collect(Collectors.toMap(User::getId, Function.identity(), (existing, replacement) -> replacement));
+        System.out.println(map);
+    }
+
+    @Test
+    public void test83() throws InterruptedException {
+        Map<String, AutoResetFlag> autoResetFlagMap = new HashMap<>();
+        AutoResetFlag autoResetFlag1 = new AutoResetFlag();
+        autoResetFlag1.setTrue(60);
+
+        Thread.sleep(20000);
+        AutoResetFlag autoResetFlag2 = new AutoResetFlag();
+        autoResetFlag2.setTrue(60);
+
+        autoResetFlagMap.put("1", autoResetFlag1);
+        autoResetFlagMap.put("2", autoResetFlag2);
+
+        log.info("autoResetFlagMap:{}", autoResetFlagMap);;
+
+        for (int i = 0; i < 20; i++) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            log.info("autoResetFlagMap:{}", autoResetFlagMap);;
+        }
+    }
+
+    @Test
+    public void test84() {
+        String str = "[2025-04-07 02:22:09,939] [INFO] [io.way.bidder.service.block.imp.FilterKeyBlock] {ADX:wayio} {bidId:1be21810135711f0b47352540005c2d8} {IN:filterKey:WAYIO42nSID19115|WAYIO42nSID19117|WAYIO42nSID18996|WAYIO42nSID19116|WAYIO42nSID18997|WAYIO42nSID18998|WAYIO42nSID19118|WAYIO42nSID18999} {OUT:filterKey:null} {EC:SE00004} {M:filter key isn't exist}";
+        //取出{}中的字符串 再用:分割，将结果放入Map中
+        //{ADX=wayio, IN:filterKey=WAYIO42nSID19115|WAYIO42nSID19117|WAYIO42nSID18996, M=filter key isn't exist, bidId=1be21810135711f0b47352540005c2d8, EC=SE00004, OUT:filterKey=null}
+        Map<String, String> map = new HashMap<>();
+        String[] split = str.split("\\{");
+        for (int i = 1; i < split.length; i++) {
+            String[] split1 = split[i].split("}");
+            if (split1.length == 2) {
+                String[] split2 = split1[0].split(":");
+                if (split2.length == 2) {
+                    map.put(split2[0], split2[1]);
+                } else if (split2.length == 3) {
+                    map.put(split2[0] + ":" + split2[1], split2[2]);
+                }
+            } else if (split1.length == 1){
+                String[] split2 = split1[0].split(":");
+                if (split2.length == 2) {
+                    map.put(split2[0], split2[1]);
+                } else if (split2.length == 3) {
+                    map.put(split2[0] + ":" + split2[1], split2[2]);
+                }
+            }
+        }
+        System.out.println(map);
+    }
+
+    @Test
+    public void test85() {
+//        String str = "WAYIO42nSID19115|WAYIO42nSID19117|WAYIO42nSID18996|WAYIO42nSID19116|WAYIO42nSID18997";
+        String str = "WAYIO42720x1280";
+        String[] split = str.split("\\|");
+        List<String> inCreativeFilterKeys  = Arrays.asList(split);
+        for (String inCreativeFilterKey : inCreativeFilterKeys) {
+            String strategyCreativeFilterKeyNew = inCreativeFilterKey.split("SID").length > 1 ? inCreativeFilterKey.split("SID")[0] : inCreativeFilterKey;
+            inCreativeFilterKeys.set(inCreativeFilterKeys.indexOf(inCreativeFilterKey), strategyCreativeFilterKeyNew);
+        }
+        Set<String> inCreativeFilterKeySet  = new HashSet<>(inCreativeFilterKeys);
+
+        //策略的creativeFilterKeys
+        List<String> strategyCreativeFilterKeys = new ArrayList<>();
+        strategyCreativeFilterKeys.add("WAYIO42nSID19115");
+        strategyCreativeFilterKeys.add("WAYIO52nSID19115");
+        strategyCreativeFilterKeys.add("WAYIO12nSID19115");
+        for (String strategyCreativeFilterKey : strategyCreativeFilterKeys) {
+            String strategyCreativeFilterKeyNew = strategyCreativeFilterKey.split("SID").length > 1 ? strategyCreativeFilterKey.split("SID")[0] : strategyCreativeFilterKey;
+            strategyCreativeFilterKeys.set(strategyCreativeFilterKeys.indexOf(strategyCreativeFilterKey), strategyCreativeFilterKeyNew);
+        }
+
+        System.out.println(inCreativeFilterKeySet);
+        System.out.println(strategyCreativeFilterKeys);
+        System.out.println(isContains(inCreativeFilterKeySet, strategyCreativeFilterKeys));
+
+    }
+
+    public static boolean isContains(Set<String> inCreativeFilterKeys, List<String> strategyCreativeFilterKeys) {
+        for (String s : inCreativeFilterKeys) {
+            if (strategyCreativeFilterKeys.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Test
+    public void test86() {
+        Map<String, String> map = new HashMap<>();
+        map.put("a", "1");
+        map.put("b", "2");
+        map.put("c", "3");
+        map.put("d", "4");
+        map.put("e", "5");
+        //根据value找key
+        System.out.println(findByValue(map, "4"));
+        System.out.println(findByValue(map, "44"));
+    }
+
+    public String findByValue(Map<String, String> map, String value) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    @Test
+    public void test87() {
+        String str = "[{\"id\":\"1000\",\"name\":\"影音娱乐\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1016\",\"name\":\"电视\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1017\",\"name\":\"视频\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1018\",\"name\":\"音乐\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1019\",\"name\":\"K歌\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1020\",\"name\":\"直播\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1021\",\"name\":\"电台\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1093\",\"name\":\"游戏\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1001\",\"name\":\"实用工具\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1022\",\"name\":\"输入法\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1023\",\"name\":\"浏览器\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1024\",\"name\":\"Wi-Fi\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1025\",\"name\":\"安全性能\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1026\",\"name\":\"工具\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1027\",\"name\":\"闹钟\",\"parent_id\":\"1001\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1002\",\"name\":\"社交通讯\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1028\",\"name\":\"社区\",\"parent_id\":\"1002\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1029\",\"name\":\"聊天\",\"parent_id\":\"1002\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1030\",\"name\":\"婚恋\",\"parent_id\":\"1002\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1031\",\"name\":\"通讯\",\"parent_id\":\"1002\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1003\",\"name\":\"教育\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1032\",\"name\":\"英文\",\"parent_id\":\"1003\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1033\",\"name\":\"学习\",\"parent_id\":\"1003\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1034\",\"name\":\"翻译\",\"parent_id\":\"1003\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1035\",\"name\":\"备考\",\"parent_id\":\"1003\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1004\",\"name\":\"新闻阅读\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1036\",\"name\":\"电子书\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1037\",\"name\":\"新闻\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1038\",\"name\":\"动漫\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1039\",\"name\":\"有声读物\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1040\",\"name\":\"杂志\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1041\",\"name\":\"幽默\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1042\",\"name\":\"体育\",\"parent_id\":\"1004\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1005\",\"name\":\"拍摄美化\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1043\",\"name\":\"拍照\",\"parent_id\":\"1005\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1044\",\"name\":\"图像美化\",\"parent_id\":\"1005\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1045\",\"name\":\"相册图库\",\"parent_id\":\"1005\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1046\",\"name\":\"短视频\",\"parent_id\":\"1005\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1047\",\"name\":\"影音编辑\",\"parent_id\":\"1005\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1006\",\"name\":\"美食\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1048\",\"name\":\"菜谱\",\"parent_id\":\"1006\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1049\",\"name\":\"生鲜\",\"parent_id\":\"1006\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1050\",\"name\":\"外卖\",\"parent_id\":\"1006\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1051\",\"name\":\"餐饮\",\"parent_id\":\"1006\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1007\",\"name\":\"出行导航\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1052\",\"name\":\"导航\",\"parent_id\":\"1007\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1053\",\"name\":\"地图\",\"parent_id\":\"1007\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1054\",\"name\":\"用车\",\"parent_id\":\"1007\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1055\",\"name\":\"交通票务\",\"parent_id\":\"1007\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1056\",\"name\":\"公交地铁\",\"parent_id\":\"1007\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1008\",\"name\":\"旅游住宿\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1057\",\"name\":\"住宿\",\"parent_id\":\"1008\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1058\",\"name\":\"旅游\",\"parent_id\":\"1008\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1059\",\"name\":\"行程助手\",\"parent_id\":\"1008\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1009\",\"name\":\"购物比价\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1060\",\"name\":\"优惠\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1061\",\"name\":\"商城\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1062\",\"name\":\"团购\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1063\",\"name\":\"海淘\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1064\",\"name\":\"导购\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1065\",\"name\":\"快递\",\"parent_id\":\"1009\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1010\",\"name\":\"商务\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1066\",\"name\":\"办公软件\",\"parent_id\":\"1010\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1067\",\"name\":\"效率\",\"parent_id\":\"1010\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1068\",\"name\":\"笔记\",\"parent_id\":\"1010\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1069\",\"name\":\"邮箱\",\"parent_id\":\"1010\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1070\",\"name\":\"招聘\",\"parent_id\":\"1010\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1011\",\"name\":\"儿童\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1071\",\"name\":\"儿童教育\",\"parent_id\":\"1011\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1072\",\"name\":\"儿歌\",\"parent_id\":\"1011\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1073\",\"name\":\"母婴\",\"parent_id\":\"1011\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1012\",\"name\":\"金融理财\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1074\",\"name\":\"股票基金\",\"parent_id\":\"1012\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1075\",\"name\":\"银行\",\"parent_id\":\"1012\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1076\",\"name\":\"贷款\",\"parent_id\":\"1012\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1077\",\"name\":\"理财\",\"parent_id\":\"1012\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1078\",\"name\":\"记账\",\"parent_id\":\"1012\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1013\",\"name\":\"运动健康\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1079\",\"name\":\"养生\",\"parent_id\":\"1013\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1080\",\"name\":\"运动\",\"parent_id\":\"1013\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1081\",\"name\":\"医疗\",\"parent_id\":\"1013\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1082\",\"name\":\"健康\",\"parent_id\":\"1013\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1014\",\"name\":\"便捷生活\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1083\",\"name\":\"家具装修\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1084\",\"name\":\"本地生活\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1085\",\"name\":\"租房买房\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1086\",\"name\":\"家政\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1087\",\"name\":\"电影票\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1088\",\"name\":\"天气日历\",\"parent_id\":\"1014\",\"level\":\"2\",\"del_flag\":\"0\"}]},{\"id\":\"1015\",\"name\":\"汽车\",\"parent_id\":\"0\",\"level\":\"1\",\"del_flag\":\"0\",\"child\":[{\"id\":\"1089\",\"name\":\"养车\",\"parent_id\":\"1015\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1090\",\"name\":\"违章查询\",\"parent_id\":\"1015\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1091\",\"name\":\"汽车资讯\",\"parent_id\":\"1015\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1092\",\"name\":\"驾考\",\"parent_id\":\"1015\",\"level\":\"2\",\"del_flag\":\"0\"}]}]";
+//        String str = "[{\"id\":\"1016\",\"name\":\"电视\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1017\",\"name\":\"视频\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1018\",\"name\":\"音乐\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1019\",\"name\":\"K歌\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1020\",\"name\":\"直播\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1021\",\"name\":\"电台\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"},{\"id\":\"1093\",\"name\":\"游戏\",\"parent_id\":\"1000\",\"level\":\"2\",\"del_flag\":\"0\"}]";
+        List<Industry> list  = JSONArray.parseArray(str, Industry.class);
+        for (Industry industry : list) {
+            System.out.println("INSERT INTO \"public\".\"adx_industry\" " +
+                    "(\"way_industry_id\", \"media_source_id\", \"way_industry_name\", \"level\", \"parent_industry_id\", \"source_industry_id\", \"source_industry_name\", \"remarks\", \"create_time\", \"update_time\") " +
+                    "VALUES ("+industry.getId()+", 152, '"+industry.getName()+"', 1, '0', '', '', NULL, '2025-04-09 11:11:28', NULL);");
+            for (Industry industry1 : industry.getChild()) {
+                System.out.println("INSERT INTO \"public\".\"adx_industry\" " +
+                        "(\"way_industry_id\", \"media_source_id\", \"way_industry_name\", \"level\", \"parent_industry_id\", \"source_industry_id\", \"source_industry_name\", \"remarks\", \"create_time\", \"update_time\") " +
+                        "VALUES ("+industry1.getId()+", 152, '"+industry1.getName()+"', 2, '"+industry.getId()+"', '', '', NULL, '2025-04-09 11:11:28', NULL);");
+            }
+        }
+
+
+    }
+
+    @Data
+    public static class Industry {
+        public String id;
+        public String name;
+        public String parent_id;
+        public String level;
+
+        public List<Industry> child;
+    }
+
+    @Test
+    public void test88() throws InterruptedException {
+        LinkedBlockingQueue<String> list = new LinkedBlockingQueue<>();
+        LinkedBlockingQueue<String> list2 = new LinkedBlockingQueue<>();
+        list.put("1");
+        list.put("2");
+        list.put("3");
+        list.put("4");
+        list.put("5");
+        System.out.println(list);
+        list.take();
+        list.put("6");
+        System.out.println(list);
+        list.take();
+        list.put("7");
+        System.out.println(list);
+        list.take();
+        list.put("8");
+        System.out.println(list);
+        list.drainTo(list2, 3);
+        System.out.println(list2);
+    }
+
+    @Test
+    public void test89() {
+        long startTime = System.currentTimeMillis();
+        CompletableFuture<String> future =  CompletableFuture.supplyAsync(() -> getReport("查询4月份报表", 2));
+        List<CompletableFuture<String>> futures = Arrays.asList(future,
+                CompletableFuture.supplyAsync(() -> getReport("查询1月份报表", 5)),
+                CompletableFuture.supplyAsync(() -> getReport("查询2月份报表", 8)),
+                CompletableFuture.supplyAsync(() -> getReport("查询3月份报表", 3)));
+        //等所有任务执行完
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allFutures.thenRun(() -> {
+            futures.forEach(f -> System.out.println(f.join()));
+        }).join();
+        log.info("耗时：" + (System.currentTimeMillis() - startTime));
+
+    }
+    private String getReport(String name, int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+            log.info("{} finished", name);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return name;
+    }
+
+    /**
+     * CircularFifoQueue结构可以完美的满足：
+     * 固定长度的队列，当队列满时，新元素会自动覆盖旧元素。
+     * 即：永远保留最新的N个元素。
+     */
+    @Test
+    public void test90() {
+        CircularFifoQueue<String> queue = new CircularFifoQueue<>(5); // 固定长度为5
+        queue.add("A");
+        queue.add("B");
+        queue.add("C");
+        queue.add("D");
+        queue.add("E");
+        queue.add("F"); // 自动移除头部"A"，队列变为 [B, C, D, E, F]
+        queue.add("G");
+        System.out.println(queue);
+        System.out.println(queue.peek());//检索但不移除此队列的头部
+        // put 将指定的元素插入此队列里
+        // offer 将指定的元素插入此队列里
+        // take 检索并移除此队列的头部
+        // peek 检索但不移除此队列的头部
+        // poll 检索并移除此队列的头部
+        System.out.println(queue);
+        System.out.println(queue.poll());//检索并移除此队列的头部
+//        System.out.println(queue.get(0));
+        System.out.println(queue);
+    }
+
+    @Test
+    public void test92() {
+        Stack<String> stack = new Stack<>();
+        stack.push("1");
+        stack.push("2");
+        stack.push("3");
+        stack.pop();
+        System.out.println(stack);
+        System.out.println(stack.peek());
+    }
 }

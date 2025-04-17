@@ -1,9 +1,11 @@
 package com.example.domain;
 
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 import java.time.Clock;
 
+@Getter
 public class UserEvent extends ApplicationEvent {
 
     private String userId;
@@ -20,7 +22,4 @@ public class UserEvent extends ApplicationEvent {
         super(source, clock);
     }
 
-    public String getUserId() {
-        return userId;
-    }
 }

@@ -10,7 +10,6 @@ import com.example.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class CommonService {
         for (TbUser user : users) {
             applicationEventPublisher.publishEvent(new UserEvent(this, user.getId() + ""));
         }
-        log.info("queryAllUser end");
+        log.info("queryAllUser end1");
         return users;
     }
 

@@ -25,6 +25,7 @@ public class Application {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("---------------------------shutdown hook---------------------------");
             String value = JSON.toJSONString(CacheData.getList());
+            log.info("写入文件：{}", value);
             //写入文件
             CacheData.writeFile(value);
             log.info("---------------------------shutdown hook---------------------------");

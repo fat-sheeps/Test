@@ -72,10 +72,26 @@ public class TencentAdTest {
         filteringStruct.setValues(Collections.singletonList(creativeId + ""));
         filtering.add(filteringStruct);
 
-        List<String> fields = Arrays.asList("dynamic_creative_id", "dynamic_creative_name", "created_time", "last_modified_time", "adgroup_id", "configured_status","system_status", "creative_components");
+        List<String> fields = Arrays.asList("dynamic_creative_id", "dynamic_creative_name", "created_time", "last_modified_time", "adgroup_id", "configured_status","system_status", "creative_components", "delivery_mode");
         DynamicCreativesGetResponseData result = tencentAds.dynamicCreatives().dynamicCreativesGet(accountId, filtering, 1L, 10L, fields, null, PaginationMode.NORMAL.getValue(), null);
         DynamicCreativesAddRequest data = new DynamicCreativesAddRequest();
 //        tencentAds.dynamicCreatives().dynamicCreativesAdd(data);
+        System.out.println(JSON.toJSONString(result));
+    }
+    //创意预览
+    @Test
+    public void creative_template_previews() throws ApiException {
+
+//        Long creativeId =  1808076924L;//视频
+//        Long accountId = 49341828L;
+        Long accountId = 54479923L;
+        Long creativeId =  1808341417L;//图片
+        TencentAds tencentAds = TencentAds.getInstance();
+        tencentAds.init(new ApiContextConfig(accessToken, false));
+        CreativeTemplatePreviewsGetRequest request = new CreativeTemplatePreviewsGetRequest();
+        request.setAccountId(accountId);
+        request.setDynamicCreativeId(creativeId);
+        CreativeTemplatePreviewsGetResponseData result = tencentAds.creativeTemplatePreviews().creativeTemplatePreviewsGet(request);
         System.out.println(JSON.toJSONString(result));
     }
 
@@ -141,9 +157,11 @@ public class TencentAdTest {
     @Test
     public void getAdgroup() throws ApiException {
 
-        Long adgroupId =  27509152008L;//图片
+//        Long adgroupId =  27509152008L;//图片
         Long creativeId =  1681354411L;//图片
-        Long accountId = 45392489L;
+//        Long accountId = 45392489L;
+        Long adgroupId =  29659824114L;//图片
+        Long accountId = 42706622L;
         TencentAds tencentAds = TencentAds.getInstance();
         tencentAds.init(new ApiContextConfig(accessToken, false));
 
@@ -154,8 +172,8 @@ public class TencentAdTest {
         filteringStruct.setValues(Collections.singletonList(adgroupId + ""));
 //        filtering.add(filteringStruct);
 
-        List<String> fields = Arrays.asList("adgroup_id", "adgroup_name", "created_time", "last_modified_time", "system_status", "configured_status", "targeting_translation","marketing_carrier_type","marketing_carrier_detail");
-        AdgroupsGetResponseData result = tencentAds.adgroups().adgroupsGet(accountId, filtering, 1L, 100L, null, fields, PaginationMode.NORMAL.getValue(), null);
+        List<String> fields = Arrays.asList("adgroup_id", "adgroup_name", "created_time", "last_modified_time", "system_status", "configured_status", "targeting_translation","marketing_carrier_type","marketing_carrier_detail", "material_package_id", "marketing_goal", "marketing_sub_goal", "marketing_carrier_type", "marketing_target_type", "site_set", "search_expansion_switch", "automatic_site_enabled", "daily_budget", "smart_bid_type", "optimization_goal", "bid_amount", "deep_conversion_type", "deep_conversion_behavior_bid", "conversion_id", "deep_conversion_worth_advanced_rate", "bid_mode", "bid_strategy", "bid_scene", "auto_acquisition_enabled", "auto_acquisition_status", "begin_date", "end_date", "time_series", "first_day_begin_time", "targeting", "targeting_translation", "gender", "age", "education", "app_install_status", "excluded_converted_audience", "user_os", "excluded_os", "network_type", "custom_audience", "excluded_custom_audience", "device_brand_model", "included_list", "excluded_list");
+        AdgroupsGetResponseData result = tencentAds.adgroups().adgroupsGet(accountId, filtering, 1L, 5L, null, fields, PaginationMode.NORMAL.getValue(), null);
         AdgroupsAddRequest data = null;
 //        tencentAds.adgroups().adgroupsAdd(data, null);
         System.out.println(JSON.toJSONString(result));

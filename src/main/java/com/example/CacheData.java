@@ -42,7 +42,8 @@ public class CacheData {
                     list.add(item.toString());
                 });
             }
-            writeFile("");
+            log.info("读取文件成功, value:{}", text);
+            //writeFile("");
         } catch (Exception e) {
             log.error("读取文件失败", e);
         }

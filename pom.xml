@@ -22,7 +22,7 @@
         <project.reporting.outPutEncoding>UTF-8</project.reporting.outPutEncoding>
         <java.version>1.8</java.version>
         <springboot-version>2.7.0</springboot-version>
-<!--        <hutool-version>5.8.7</hutool-version> 请求http://localhost:8888/imp?id=1&name=提升-30%&ua=ua 会报错-->
+<!--        <hutool-version>5.8.7</hutool-version> 高版本url带%会报错 请求http://localhost:8888/imp?id=1&name=提升-30%&ua=ua 会报错-->
         <hutool-version>5.7.8</hutool-version>
         <fastjson-version>1.2.49</fastjson-version>
         <springfox-swagger-version>2.6.1</springfox-swagger-version>
@@ -41,6 +41,17 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!-- 以pinyin4j为例 -->
+        <dependency>
+             <groupId>com.belerweb</groupId>
+             <artifactId>pinyin4j</artifactId>
+             <version>2.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -113,6 +124,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
         <!-- mybatisplus与springboot整合 -->
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -175,6 +191,16 @@
             <version>3.13.0</version>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.9.3</version>
+        </dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.10</version>
@@ -195,6 +221,12 @@
             <artifactId>dingtalk</artifactId>
             <version>2.1.14</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

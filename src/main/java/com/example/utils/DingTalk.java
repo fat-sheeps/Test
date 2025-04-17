@@ -31,7 +31,7 @@ public class DingTalk {
     //test
     private static final String OPEN_CONVERSATION_ID = "cidyUYHVzqIcI89bppbsD8ukA==";
     //两小时有效，需缓存起来，请勿频繁调用getAccessToken()接口
-    private static String ACCESS_TOKEN = "46930f451e22366a941ba09d6d02aa4a";
+    private static String ACCESS_TOKEN = "fdd56a475d993947abfa00bd59a26944";
 
     /**
      * 使用 Token 初始化账号Client
@@ -60,7 +60,7 @@ public class DingTalk {
             GetAccessTokenResponse res = client.getAccessToken(getAccessTokenRequest);
             log.info("DingRobot getAccessToken res:{}", JSONObject.toJSONString(res.getBody()));
             // TODO 缓存accessToken
-            //ACCESS_TOKEN = res.getBody().getAccessToken();
+            ACCESS_TOKEN = res.getBody().getAccessToken();
             //过期秒数：res.getBody().getExpireIn();
             return res.getBody().getAccessToken();
         } catch (TeaException err) {
@@ -172,16 +172,20 @@ public class DingTalk {
     public static void main(String[] args) throws Exception {
         //
         JSONObject json = new JSONObject();
-        json.put("title", "title");
+        json.put("title", "测试-广点通-DSP对账单 2025-01-02");
 //        json.put("text", "### 请求数告警 \n  陌陌安卓开屏4点请求数：423387，昨日4点请求数：623387，环比下降<font color=#00FF00>50%</font>。 ###### \n 环比上升<font color=#FF0000>50%</font>【测试】");
-        json.put("text", "### title \n  - 50166-广告位名称: --, 流量主名称: 爱客美, 量级: 0.0 , 流量主收益(元)环比: -100% \n - 50166-广告位名称: --, 流量主名称: 爱客美, 量级: 0.0 , 流量主收益(元)环比: -100% \n - 50166-广告位名称: --, 流量主名称: 爱客美, 量级: 0.0 , 流量主收益(元)环比: -100%");
-        int res = sendGroupMsg("请求数告警", "", json.toJSONString());
+        json.put("text",
+                "#### 测试-广点通-DSP对账单 2025-01-02 \n " +
+                "|tencent(¥) | dsp(¥) |  gap(¥)  | gap | \n " +
+                "|:-------------- |:------------|:------------ |:------------| \n " +
+                "|9755.54 | 1890.0 | 7865.54 | 416.17% |");
+        int res = sendGroupMsg("测试-广点通-DSP对账单 2025-01-02", "", json.toJSONString());
         System.out.println(res);
+
 //        String accessToken = DingTalk.getAccessToken();
 //        System.out.println(accessToken);
 
 
-//        String openConversationId = DingTalk.getOpenConversationId("");
-//        System.out.println(openConversationId);
+
     }
 }
