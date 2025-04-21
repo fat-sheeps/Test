@@ -12,4 +12,13 @@
           name
     </select>
 
+    <update id="updateScore">
+        UPDATE
+          user
+        SET
+          score = score + #{step}
+        WHERE
+          id = #{id}
+    </update>
+
 </mapper>

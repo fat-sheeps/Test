@@ -25,6 +25,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.domain.DspProtoSurge;
 import com.example.domain.Student;
 import com.example.domain.SubUser;
+import com.example.domain.User;
 import com.example.utils.AutoResetFlag;
 import com.example.utils.OKHttpUtil;
 import com.example.utils.UrlUtil;
@@ -68,6 +69,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -143,8 +145,8 @@ public class Test2 {
 
     @Test
     public void test05() {
-        java.sql.Timestamp timestamp = new java.sql.Timestamp(System.currentTimeMillis());
-        java.sql.Timestamp timestamp1 = new java.sql.Timestamp(System.currentTimeMillis() + 1);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Timestamp timestamp1 = new Timestamp(System.currentTimeMillis() + 1);
         //比较大小
         System.out.println(timestamp.before(timestamp1));
         System.out.println(timestamp1.before(timestamp));
@@ -158,7 +160,7 @@ public class Test2 {
         File file = new File("C:\\Users\\Administrator\\Desktop\\1.txt");
         InputStream is = null;
         try {
-            is = java.nio.file.Files.newInputStream(file.toPath());
+            is = Files.newInputStream(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -2319,5 +2321,37 @@ public class Test2 {
         stack.pop();
         System.out.println(stack);
         System.out.println(stack.peek());
+
+        System.out.println(Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void test93() {
+        System.out.println(toLogStr("结果：a:{}， b:{}, c:{}", "1", "2", "3", "4"));
+        System.out.println(toLogStr("结果：a:{}， b:{}, c:{}", "1", "2"));
+    }
+
+    private static String toLogStr(String msg, String ... args) {
+        String str = msg;
+        for (String arg : args) {
+            str = str.replaceFirst("\\{}", arg);
+        }
+        return str;
+
+    }
+    
+    @Test
+    public void test94()  {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String str = "{\"id\":\"1\",\"name\":\"张三\",\"age\":\"18\"}";
+        User user = null;
+        try {
+            user = mapper.readValue(str, User.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(user);
     }
 }

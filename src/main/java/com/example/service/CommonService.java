@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,27 @@ public class CommonService {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    /**
+     * 更新用户积分
+     * MVCC可保证多个线程同时执行 数据不会重复
+     * @param seconds
+     * @throws InterruptedException
+     */
+    @Transactional
+    public void updateScore(int seconds, int step) throws InterruptedException {
+        log.info("updateScore begin:");
+        userMapper.updateScore(1L, step);
+        Thread.sleep(seconds * 1000L);
+        TbUser user = userMapper.selectById(1);
+        List<Integer> ids = new ArrayList<>();
+        for (int i = 0; i < step; i++) {
+            ids.add(user.getScore() - i);
+        }
+        log.info("updateScore end score:{}", user.getScore());
+        //TODO ids 可放到一个全局队列中，一旦用完，则触发当前方法重新生成step个新id放到队列中供后续使用
+        log.info("current ids:{}", ids);
+    }
     public Object queryAllUser() {
         log.info("queryAllUser begin:");
         QueryWrapper<TbUser> queryWrapper = new QueryWrapper<>();
